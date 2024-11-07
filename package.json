@@ -1,0 +1,45 @@
+{
+  "name": "multi-service-backend",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "nodemon",
+    "test": "jest",
+    "test:ci": "jest --coverage --ci",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx,json,md}",
+    "lint:fix": "eslint . --fix",
+    "prettier": "npx prettier --write src/**/*.{js,jsx,ts,tsx,json,md}",
+    "build": "tsc",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "build-start": "npm run build && npm start"
+  },
+  "keywords": [],
+  "author": "Joy",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^20.16.5",
+    "@types/supertest": "^6.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.17.1",
+    "socket.io": "^4.7.5"
+  }
+}
