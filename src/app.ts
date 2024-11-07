@@ -1,12 +1,16 @@
 import cors from "cors";
+import morgan from "morgan";
 import helmet from "helmet";
 import routes from "./routes/index";
+import cookieParser from "cookie-parser";
 import corsOption from "./lib/corsOptions";
 import type CustomError from "./types/api/CustomError";
-import express, { NextFunction, Request, Response } from "express";
 import { createResponse } from "./lib/responseHelpers";
+import express, { NextFunction, Request, Response } from "express";
 
 const app = express();
+
+app.set("view engine", "ejs");
 
 app.use(
   helmet({
@@ -14,7 +18,13 @@ app.use(
     frameguard: true,
   }),
 );
+app.use(cookieParser());
+app.use(morgan("common"));
 app.use(cors(corsOption));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use('/public', express.static(path.join(__dirname, 'public')));
+
 app.use(routes);
 
 app.get("/", (req, res) => {
