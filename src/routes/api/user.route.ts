@@ -25,7 +25,7 @@ router.put(
   checkRoles(["ADMIN"]),
   asyncWrapper(userController.update),
 );
-router.put(
+router.delete(
   "/delete",
   checkAuth,
   checkRoles(["ADMIN"]),
