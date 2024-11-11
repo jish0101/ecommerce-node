@@ -1,9 +1,9 @@
 import express from "express";
-import apiRoutes from "./api/routes";
 import { KEYS } from "../lib/keys";
+import apiRoutes from "./api/routes";
 
-const router = express.Router();
 const { API_ROUTE } = KEYS;
+const router = express.Router();
 
 router.use(API_ROUTE, apiRoutes);
 

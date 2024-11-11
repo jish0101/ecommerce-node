@@ -1,8 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 
-export const asyncWrapper = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>,
-) => {
+type ControllerFunc = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Promise<any>;
+
+export const asyncWrapper = (fn: ControllerFunc) => {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res, next).catch(next);
   };

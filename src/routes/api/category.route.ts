@@ -1,30 +1,30 @@
-import express from "express";
-import ProductController from "@/controllers/products/product.controller";
+import Category from "@/controllers/category/category.controller";
 import { asyncWrapper } from "@/lib/helpers";
 import checkAuth from "@/middlewares/checkAuth";
 import checkRoles from "@/middlewares/checkRoles";
+import express from "express";
 
 const router = express.Router();
-const productController = new ProductController();
+const categoryController = new Category();
 
 router.post(
   "/create",
   checkAuth,
   checkRoles(["ADMIN"]),
-  asyncWrapper(productController.create),
+  asyncWrapper(categoryController.create),
 );
 router.put(
   "/update",
   checkAuth,
   checkRoles(["ADMIN"]),
-  asyncWrapper(productController.update),
+  asyncWrapper(categoryController.update),
 );
 router.delete(
   "/delete",
   checkAuth,
   checkRoles(["ADMIN"]),
-  asyncWrapper(productController.delete),
+  asyncWrapper(categoryController.delete),
 );
-router.get("/get", asyncWrapper(productController.get));
+router.get("/get", asyncWrapper(categoryController.get));
 
 export default router;
