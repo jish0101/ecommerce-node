@@ -1,33 +1,31 @@
 import express from "express";
 import { asyncWrapper } from "../../lib/helpers";
-import checkAuth from "../../middlewares/checkAuth";
 import checkRoles from "../../middlewares/checkRoles";
 import UserController from "../../controllers/user/user.controller";
+import multerInstance from "@/lib/multer";
 
 const router = express.Router();
 const userController = new UserController();
 
-router.get(
-  "/get",
-  checkAuth,
-  checkRoles(["ADMIN"]),
-  asyncWrapper(userController.get),
-);
+router.get("/get", checkRoles(["ADMIN"]), asyncWrapper(userController.get));
 router.post(
   "/create",
-  checkAuth,
   checkRoles(["ADMIN"]),
   asyncWrapper(userController.create),
 );
 router.put(
   "/update",
-  checkAuth,
   checkRoles(["ADMIN"]),
   asyncWrapper(userController.update),
 );
+router.put(
+  "/profile",
+  // checkRoles(["ADMIN"]),
+  multerInstance.single("profile"),
+  asyncWrapper(userController.updateProfile),
+);
 router.delete(
   "/delete",
-  checkAuth,
   checkRoles(["ADMIN"]),
   asyncWrapper(userController.delete),
 );

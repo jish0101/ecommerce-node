@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRoles } from "src/models/user/user.model";
+import { PayloadUser, UserRoles } from "src/models/user/user.model";
 
 const checkRoles =
   (allowedRoles: UserRoles[]) =>
   (req: Request, res: Response, next: NextFunction) => {
-    if (req.user && allowedRoles.includes(req.user.role)) {
+    const user = req.user as PayloadUser;
+    if (user && allowedRoles.includes(user.role)) {
       return next();
     }
     return next(new Error("Unauthorized"));
