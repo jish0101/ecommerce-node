@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "prettier": "npx prettier --write src/**/*.{js,jsx,ts,tsx,json,md}",
     "build": "tsc -p tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist",
-    "start": "node -r tsconfig-paths/register dist/index.js",
+    "start": "node dist/index.js",
     "build-start": "npm run build && npm start"
   },
   "keywords": [],

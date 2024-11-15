@@ -65,8 +65,8 @@ class ProductController {
     );
   }
   async delete(req: Request, res: Response) {
-    const user = req.user as PayloadUserWithID;
-    const deletedProduct = await Product.findByIdAndDelete(user._id);
+    const result = idSchema.parse(req.body);
+    const deletedProduct = await Product.findByIdAndDelete(result._id);
 
     return res.json(
       createResponse(200, deletedProduct, "Successfully deleted product"),

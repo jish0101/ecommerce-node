@@ -4,6 +4,7 @@ import { createResponse } from "@/lib/responseHelpers";
 import { Address } from "@/models/address/address.model";
 import { createAddressSchema } from "./validationSchema";
 import { PayloadUser } from "@/models/user/user.model";
+import { CustomError } from "@/lib/customError";
 
 class AddressController {
   async get(req: Request, res: Response) {
@@ -67,6 +68,13 @@ class AddressController {
     const deletedAddress = await Address.findOneAndDelete({
       $and: [{ user: user._id }, { _id: payload._id }],
     });
+
+    if (!deletedAddress) {
+      throw new CustomError(
+        "Address not found or not authorized to delete",
+        404,
+      );
+    }
 
     res.json(
       createResponse(200, deletedAddress, "Successfully deleted address"),
