@@ -5,7 +5,7 @@ import {
   ExtractJwt,
   StrategyOptionsWithoutRequest,
 } from "passport-jwt";
-import { User } from "@/models/user/user.model";
+import { PayloadUser, User } from "@/models/user/user.model";
 
 const options: StrategyOptionsWithoutRequest = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -18,7 +18,15 @@ passport.use(
       const user = await User.findById(jwtPayload._id);
 
       if (user) {
-        return done(null, user);
+        const payloadUser: PayloadUser & { _id: string } = {
+          _id: String(user._id),
+          email: user.email,
+          userName: user.userName,
+          isVerified: user.isVerified,
+          profileImage: user.profileImage,
+          role: user.role,
+        };
+        return done(null, payloadUser);
       } else {
         return done(null, false);
       }

@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
+import { AddressT } from "@/controllers/address/validationSchema";
 
-const addSchema = new mongoose.Schema(
+type Schema = AddressT & { user: typeof mongoose.Schema.ObjectId };
+
+const addSchema = new mongoose.Schema<Schema>(
   {
     user: {
       type: mongoose.Schema.ObjectId,
@@ -40,4 +43,4 @@ const addSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export const Address = mongoose.model("Address", addSchema);
+export const Address = mongoose.model<Schema>("Address", addSchema);

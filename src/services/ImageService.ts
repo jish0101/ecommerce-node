@@ -11,9 +11,9 @@ type Config = {
 };
 
 class OptimisedImage {
-  file: Express.Multer.File;
+  file: Express.Multer.File | undefined;
 
-  constructor(file: Express.Multer.File) {
+  constructor(file?: Express.Multer.File) {
     this.file = file;
   }
 
@@ -27,7 +27,7 @@ class OptimisedImage {
     }
 
     try {
-      await sharp(this.file.buffer)
+      await sharp(this.file?.buffer)
         .resize({ width: w, height: h })
         .jpeg({ quality: q })
         .toFile(resultDir);

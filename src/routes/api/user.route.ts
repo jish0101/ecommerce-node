@@ -20,7 +20,7 @@ router.put(
 );
 router.put(
   "/profile",
-  // checkRoles(["ADMIN"]),
+  checkRoles(["ADMIN"]),
   multerInstance.single("profile"),
   asyncWrapper(userController.updateProfile),
 );

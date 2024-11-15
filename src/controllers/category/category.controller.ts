@@ -33,7 +33,7 @@ class Category {
     );
   }
   async delete(req: Request, res: Response) {
-    const body = idSchema.parse(req.body);
+    const body = idSchema.parse(req.query);
     const deletedUser = await CategoryModel.findOneAndDelete({ _id: body._id });
 
     res.json(

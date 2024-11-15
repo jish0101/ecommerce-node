@@ -16,17 +16,24 @@ class AuthController {
       throw new CustomError("Credentials are not valid", 400);
     }
 
-    const { email, userName, id, isVerified, role } = user;
-    const accessToken = getToken(
-      { _id: id, email, userName, isVerified, role },
-      "access",
-    );
-    const refreshToken = getToken(
-      { _id: id, email, userName, isVerified, role },
-      "refresh",
-    );
+    const { email, userName, _id, isVerified, role, profileImage } = user;
+    const payloadUser: PayloadUser & { _id: string; accessToken?: string } = {
+      _id: String(_id),
+      email,
+      isVerified,
+      role,
+      userName,
+      profileImage,
+    };
+    const accessToken = getToken(payloadUser, "access");
+    const refreshToken = getToken(payloadUser, "refresh");
 
-    const payloadUser = { email, isVerified, role, userName, accessToken };
+    user.refreshToken = refreshToken;
+
+    await user.save();
+
+    payloadUser.accessToken = accessToken;
+
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       path: "/",
@@ -54,7 +61,7 @@ class AuthController {
   async refreshToken(req: Request, res: Response) {
     const cookies = req.cookies;
 
-    if (!cookies.refresh_token) {
+    if (!cookies || !cookies.refresh_token) {
       throw new CustomError("Credentials are not valid", 400);
     }
 
@@ -67,10 +74,10 @@ class AuthController {
       throw new CustomError("Credentials are not valid", 400);
     }
 
-    const { _id, email, isVerified, role, userName } = isOk;
+    const { _id, email, isVerified, role, userName, profileImage } = isOk;
 
     const accessToken = getToken(
-      { _id, email, isVerified, role, userName },
+      { _id, email, isVerified, role, userName, profileImage },
       "access",
     );
 
@@ -78,14 +85,14 @@ class AuthController {
       createResponse(
         200,
         { ...isOk, accessToken },
-        "Successfully updated auth status",
+        "Successfully updated auth",
       ),
     );
   }
 }
 
 const getToken = (
-  payload: PayloadUser & { _id: string },
+  payload: PayloadUser & { _id: string; accessToken?: string },
   t: "access" | "refresh",
 ) => {
   if (t === "access") {

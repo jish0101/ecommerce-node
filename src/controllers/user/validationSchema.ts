@@ -23,3 +23,16 @@ export const updateUserSchema = z.object({
   otp_id: z.string().optional(),
   otp_value: z.number().optional(),
 });
+
+export const profileFileSchema = z.object({
+  buffer: z.instanceof(Buffer),
+  destination: z.string(),
+  fieldname: z.string(),
+  filename: z.string(),
+  mimetype: z.string(),
+  originalname: z.string(),
+  path: z.string(),
+  size: z.number(),
+  stream: z.any(),
+  encoding: z.string(),
+});

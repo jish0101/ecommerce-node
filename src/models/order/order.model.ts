@@ -13,13 +13,13 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    orderPrice: {
-      type: Number,
-      required: true,
-    },
     customer: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
+      required: true,
+    },
+    orderPrice: {
+      type: Number,
       required: true,
     },
     orderItems: {

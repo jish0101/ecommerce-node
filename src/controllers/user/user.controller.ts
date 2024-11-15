@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { createResponse } from "../../lib/responseHelpers";
 import { createUserSchema, updateUserSchema } from "./validationSchema";
-import { User } from "@/models/user/user.model";
+import { PayloadUser, User } from "@/models/user/user.model";
 import { CustomError } from "@/lib/customError";
 import idSchema from "../idSchema";
 import { Otp } from "@/models/otp/Otp";
@@ -65,25 +65,52 @@ class UserController {
       email: body.email,
     });
 
-    res.json(createResponse(200, updatedUser, "Successfully updated user"));
+    if (!updatedUser) {
+      throw new CustomError("Server error", 500);
+    }
+
+    const { password, ...data } = updatedUser;
+
+    res.json(createResponse(200, data, "Successfully updated user"));
   }
   async updateProfile(req: Request, res: Response) {
     if (!req.file) {
       throw new CustomError("image file is missing", 400);
     }
 
+    const user = req.user as PayloadUser & { _id: string };
+
+    if (!user) {
+      throw new CustomError("user is missing", 404);
+    }
+
+    const foundUser = await User.findById(user._id);
+
+    if (!foundUser) {
+      throw new CustomError("user not found", 404);
+    }
+
     const opm = new OptimisedImage(req.file);
+
+    if (foundUser.profileImage) {
+      opm.deleteImageByLink(foundUser.profileImage);
+    }
+
     const image = await opm.getProfileImg({
       w: 400,
       h: 400,
       q: 80,
-      dir: "user-profile",
+      dir: foundUser.email,
     });
+
+    foundUser.profileImage = image;
+
+    await foundUser.save();
 
     res.json(createResponse(200, image, "Successfully uploaded profile"));
   }
   async delete(req: Request, res: Response) {
-    const id = idSchema.parse(req.body);
+    const id = idSchema.parse(req.query);
 
     const deletedUser = await User.findByIdAndDelete(id);
 

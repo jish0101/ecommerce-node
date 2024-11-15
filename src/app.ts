@@ -22,15 +22,16 @@ app.use(
     frameguard: true,
   }),
 );
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(credentials);
 app.use(cors(corsOption));
-// app.use(passport.initialize());
-// app.use(authenticateJwt());
+app.use(passport.initialize());
+app.use(authenticateJwt());
 app.use(morgan("common"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(routes);
 
 app.get("/", (req, res) => {

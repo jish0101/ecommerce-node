@@ -25,12 +25,15 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    imageLinks: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+    imageLinks: {
+      type: [String],
+      default: [],
+    },
+    updatedBy: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: true,
+    },
     createdBy: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

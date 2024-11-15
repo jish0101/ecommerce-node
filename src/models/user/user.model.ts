@@ -8,13 +8,16 @@ export interface IUser extends Document {
   password: string;
   isVerified: boolean;
   refreshToken?: string;
+  profileImage?: string;
   role: UserRoles;
 }
 
 export type PayloadUser = Pick<
   IUser,
-  "userName" | "email" | "isVerified" | "role"
+  "userName" | "email" | "isVerified" | "role" | "profileImage"
 >;
+
+export type PayloadUserWithID = PayloadUser & { _id: string };
 
 const userSchema = new mongoose.Schema<IUser>(
   {
@@ -45,6 +48,9 @@ const userSchema = new mongoose.Schema<IUser>(
       default: "USER",
     },
     refreshToken: {
+      type: String,
+    },
+    profileImage: {
       type: String,
     },
   },
