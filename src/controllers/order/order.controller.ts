@@ -9,18 +9,20 @@ import {
 } from "./validationSchema";
 import { Address } from "@/models/address/address.model";
 import { Product } from "@/models/product/product.model";
-import { PayloadUserWithID, User } from "@/models/user/user.model";
+import { PayloadUserWithID } from "@/models/user/user.model";
 
 class OrderController {
   async create(req: Request, res: Response) {
-    const result = createOrderSchema.parse(req.body);
+    const { productData } = createOrderSchema.parse(req.body);
     const payloadUser = req.user as PayloadUserWithID;
 
     const [addressDoc, products] = await Promise.all([
       Address.findOne({
         $and: [{ user: payloadUser._id }, { isPrimary: true }],
       }),
-      Product.find({ _id: { $in: result } }),
+      Product.find({
+        _id: { $in: productData.map((p) => p.productId) },
+      }).lean(),
     ]);
 
     if (!products || products.length < 1) {
@@ -35,12 +37,12 @@ class OrderController {
     const productIdWithNewStocks: { _id: string; stock: number }[] = [];
 
     const totalOrderCost = products.reduce((prev, product) => {
-      const currentProd = result.find(
+      const currentProd = productData.find(
         (prod) => prod.productId === product._id.toString(),
       );
 
+      // incase: stock is insufficient or product not found
       if (!currentProd || product.stock < currentProd.quantity) {
-        // incase: stock is insufficient or product not found
         excludedProducts.push(product);
         return 0;
       }
@@ -69,18 +71,16 @@ class OrderController {
 
     const createdOrder = await Order.create({
       address: `${street}, ${city}, ${state}, ${country}, ${pinCode}`,
-      orderItems: result,
+      orderItems: productData,
       customer: payloadUser._id,
       orderPrice: totalOrderCost,
     });
 
     return res.json(
-      createResponse(
-        200,
-        createdOrder,
-        "Successfully created an order",
-        excludedProducts,
-      ),
+      createResponse(200, createdOrder, "Successfully created an order", {
+        excludedProducts: excludedProducts,
+        reason: "Product(s) not found/insufficient stock(s)",
+      }),
     );
   }
   async get(req: Request, res: Response) {
@@ -92,16 +92,24 @@ class OrderController {
   async update(req: Request, res: Response) {
     const { status, orderId } = updateOrderSchema.parse(req.body);
 
-    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status });
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      {
+        status,
+      },
+      {
+        new: true,
+      },
+    ).lean();
 
     return res.json(
       createResponse(200, updatedOrder, "Successfully updated the order"),
     );
   }
   async delete(req: Request, res: Response) {
-    const { orderId } = deletedOrderSchema.parse(req.body);
+    const { orderId } = deletedOrderSchema.parse(req.query);
 
-    const deletedOrder = await Order.findByIdAndDelete(orderId);
+    const deletedOrder = await Order.findByIdAndDelete(orderId).lean();
 
     return res.json(
       createResponse(200, deletedOrder, "Successfully deleted an order"),

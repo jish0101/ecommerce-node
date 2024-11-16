@@ -20,6 +20,8 @@ export const imgHandler = (dir: string, bodyKey: string) =>
       });
     });
 
-    req.body[bodyKey] = imgLinks;
+    const result = await Promise.all(imgLinks);
+
+    req.body[bodyKey] = result;
     next();
   });

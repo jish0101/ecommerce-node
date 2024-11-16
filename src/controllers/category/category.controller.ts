@@ -3,6 +3,7 @@ import { Category as CategoryModel } from "../../models/category/category.model"
 import { createResponse } from "@/lib/responseHelpers";
 import { createCategorySchema } from "./validationSchema";
 import idSchema from "../idSchema";
+import { CustomError } from "@/lib/customError";
 
 class Category {
   async get(req: Request, res: Response) {
@@ -14,6 +15,13 @@ class Category {
   }
   async create(req: Request, res: Response) {
     const body = createCategorySchema.parse(req.body);
+
+    const existingCategory = await CategoryModel.findOne({ name: body.name });
+
+    if (existingCategory) {
+      throw new CustomError("Category already exists", 400);
+    }
+
     const createdCategory = await CategoryModel.create(body);
 
     res.json(
@@ -26,7 +34,8 @@ class Category {
     const updatedUser = await CategoryModel.findOneAndUpdate(
       { _id: body._id },
       { name: body.name },
-    );
+      { new: true },
+    ).select("-__v");
 
     res.json(
       createResponse(200, updatedUser, "Successfully updated a category"),

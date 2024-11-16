@@ -1,12 +1,13 @@
 import express from "express";
+import { asyncWrapper } from "@/lib/helpers";
 import AddressController from "@/controllers/address/address.controller";
 
 const router = express.Router();
 const addressController = new AddressController();
 
-router.post("/create", addressController.create);
-router.put("/update", addressController.update);
-router.put("/delete", addressController.delete);
-router.put("/get", addressController.get);
+router.get("/get", asyncWrapper(addressController.get));
+router.put("/update", asyncWrapper(addressController.update));
+router.post("/create", asyncWrapper(addressController.create));
+router.delete("/delete", asyncWrapper(addressController.delete));
 
 export default router;

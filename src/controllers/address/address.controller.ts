@@ -55,7 +55,8 @@ class AddressController {
         isPrimary: payload.isPrimary,
         user: user._id,
       },
-    );
+      { new: true },
+    ).lean();
 
     res.json(
       createResponse(200, updatedAddress, "Successfully updated user address"),
@@ -65,15 +66,19 @@ class AddressController {
     const payload = idSchema.parse(req.query);
     const user = req.user as PayloadUser & { _id: string };
 
-    const deletedAddress = await Address.findOneAndDelete({
-      $and: [{ user: user._id }, { _id: payload._id }],
-    });
+    if (!user || !user._id) {
+      throw new CustomError("User not found", 400);
+    }
+
+    const deletedAddress = await Address.findOneAndDelete(
+      {
+        $and: [{ user: user._id }, { _id: payload._id }, { isPrimary: false }],
+      },
+      { new: true },
+    ).lean();
 
     if (!deletedAddress) {
-      throw new CustomError(
-        "Address not found or not authorized to delete",
-        404,
-      );
+      throw new CustomError("Non primary address not found", 404);
     }
 
     res.json(

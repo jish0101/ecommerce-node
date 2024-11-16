@@ -4,12 +4,14 @@ import { createUserSchema, updateUserSchema } from "./validationSchema";
 import { PayloadUser, User } from "@/models/user/user.model";
 import { CustomError } from "@/lib/customError";
 import idSchema from "../idSchema";
-import { Otp } from "@/models/otp/Otp";
 import OptimisedImage from "@/services/ImageService";
+import OtpService from "@/services/otpService";
 
 class UserController {
   async get(req: Request, res: Response) {
-    const users = await User.find();
+    const users = await User.find()
+      .select("-password -__v -refreshToken")
+      .lean();
 
     res.json(createResponse(200, users, "Successfully fetched users"));
   }
@@ -27,15 +29,29 @@ class UserController {
       );
     }
 
-    const { userName, email, isVerified, role, _id } = await User.create({
+    const otpService = new OtpService();
+    const user = await User.create({
       ...result,
     });
+
+    if (!user) {
+      throw new CustomError("Failed to create user", 500);
+    }
+
+    const createdOtp = await otpService.sendOtp({
+      email: user.email,
+      type: "EMAIL VERIFICATION",
+      userId: user._id as string,
+    });
+
+    const { userName, email, isVerified, role, _id } = user;
 
     res.json(
       createResponse(
         200,
         { userName, email, isVerified, role, _id },
         "Successfully created user",
+        { otp: createdOtp },
       ),
     );
   }
@@ -50,20 +66,31 @@ class UserController {
 
     // user is adding new email
     if (user.email !== body.email) {
-      const otp = await Otp.findById(body.otp_id);
-
-      if (!otp || otp.value !== body.otp_value || otp.isUsed === false) {
-        throw new CustomError("Otp not found/invalid otp", 400);
+      if (!body.otp_id || !body.otp_value) {
+        throw new CustomError(
+          "Email cannot be changed with otp_id/otp_value",
+          400,
+        );
       }
-      otp.isUsed = true;
-
-      await otp.save();
+      const otpService = new OtpService();
+      await otpService.verifyOtp({
+        _id: body._id,
+        value: body.otp_value,
+        type: "EMAIL VERIFICATION",
+        userId: user._id as string,
+      });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(body._id, {
-      userName: body.userName,
-      email: body.email,
-    });
+    const updatedUser = await User.findByIdAndUpdate(
+      body._id,
+      {
+        userName: body.userName,
+        email: body.email,
+      },
+      { new: true },
+    )
+      .select("-__v -refreshToken -password")
+      .lean();
 
     if (!updatedUser) {
       throw new CustomError("Server error", 500);
@@ -112,7 +139,9 @@ class UserController {
   async delete(req: Request, res: Response) {
     const id = idSchema.parse(req.query);
 
-    const deletedUser = await User.findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(id)
+      .select("-password -__v")
+      .lean();
 
     return res.json(
       createResponse(200, deletedUser, "Successfully deleted user"),

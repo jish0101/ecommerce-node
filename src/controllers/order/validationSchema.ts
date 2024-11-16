@@ -1,11 +1,13 @@
 import { z } from "zod";
 
-export const createOrderSchema = z.array(
-  z.object({
-    productId: z.string(),
-    quantity: z.number().positive(),
-  }),
-);
+export const createOrderSchema = z.object({
+  productData: z.array(
+    z.object({
+      productId: z.string(),
+      quantity: z.number().positive(),
+    }),
+  ),
+});
 
 export const updateOrderSchema = z.object({
   orderId: z.string(),
