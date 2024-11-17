@@ -4,17 +4,13 @@ import crypto from "crypto";
 
 type SendOtpOptions = {
   userId: string;
-  email: string;
   type: OtpAction;
 };
 
-type VerifyOtpOptions = Omit<
-  SendOtpOptions & { _id: string; value: number },
-  "email"
->;
+type VerifyOtpOptions = SendOtpOptions & { _id: string; value: number };
 
 class OtpService {
-  async createOtp({ userId, email, type }: SendOtpOptions) {
+  async createOtp({ userId, type }: SendOtpOptions) {
     const otp = crypto.randomInt(100000, 999999).toString();
     const expiresAt = Date.now() + 5 * 60 * 1000;
 
@@ -40,7 +36,7 @@ class OtpService {
     }
 
     if (result.value !== value || Date.now() > result.expiresAt) {
-      throw new CustomError("Otp is not valid/expired", 404);
+      throw new CustomError("Otp is not valid/expired", 400);
     }
 
     const updated = await Otp.findByIdAndUpdate(_id, { isUsed: true }).lean();

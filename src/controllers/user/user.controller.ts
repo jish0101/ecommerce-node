@@ -40,7 +40,6 @@ class UserController {
 
     const { userName, email, isVerified, role, _id } = user;
     const createdOtp = await otpService.createOtp({
-      email: email,
       type: "EMAIL VERIFICATION",
       userId: _id as string,
     });
@@ -50,9 +49,8 @@ class UserController {
     await mailer.sendConfirmationOtp({
       email,
       userName,
-      subject: "Email verification email",
+      type: createdOtp.type,
       otpVal: createdOtp.value,
-      templateDir: ["otp-templates", "otp.ejs"],
     });
 
     res.json(

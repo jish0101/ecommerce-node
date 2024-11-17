@@ -1,4 +1,5 @@
 import cors from "cors";
+import path from "path";
 import morgan from "morgan";
 import helmet from "helmet";
 import express from "express";
@@ -6,16 +7,23 @@ import passport from "passport";
 import routes from "./routes/index";
 import cookieParser from "cookie-parser";
 import corsOption from "./lib/corsOptions";
+import { rateLimit } from "express-rate-limit";
 import { createResponse } from "./lib/responseHelpers";
 import { credentials } from "./middlewares/credentials";
-import { authenticateJwt } from "./middlewares/passport";
 import { errorHandler } from "./middlewares/errorHandler";
-import path from "path";
 
 const app = express();
 
 app.set("view engine", "ejs");
 
+app.use(
+  rateLimit({
+    windowMs: 5 * 60 * 1000,
+    limit: 100,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+  }),
+);
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -23,7 +31,6 @@ app.use(
   }),
 );
 app.use(express.static(path.join(__dirname, "public")));
-
 app.use(credentials);
 app.use(cors(corsOption));
 app.use(passport.initialize());
