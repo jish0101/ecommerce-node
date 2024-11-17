@@ -8,7 +8,8 @@ const { API_ROUTE } = KEYS;
 const router = express.Router();
 
 router.use("/auth", authRouter);
-router.use(authenticateJwt());
+
+router.use(API_ROUTE, authenticateJwt());
 router.use(API_ROUTE, apiRoutes);
 
 export default router;
