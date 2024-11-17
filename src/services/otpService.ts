@@ -16,7 +16,7 @@ type VerifyOtpOptions = Omit<
 class OtpService {
   async sendOtp({ userId, email, type }: SendOtpOptions) {
     const otp = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = Date.now() * 5 * 60 * 1000;
+    const expiresAt = Date.now() + 5 * 60 * 1000;
 
     const createdOtp = await Otp.create({
       user: userId,
@@ -41,6 +41,12 @@ class OtpService {
 
     if (result.value !== value || Date.now() > result.expiresAt) {
       throw new CustomError("Otp is not valid/expired", 404);
+    }
+
+    const updated = await Otp.findByIdAndUpdate(_id, { isUsed: true }).lean();
+
+    if (!updated) {
+      throw new CustomError("Server error: failed to update otp status", 500);
     }
 
     return true;

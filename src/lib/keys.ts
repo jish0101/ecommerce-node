@@ -11,4 +11,9 @@ export const KEYS: Record<string, string> = {
   DB_URL: process.env.DB_URL!,
   JWT_SECRET: process.env.JWT_SECRET!,
   REFRESH_SECRET: process.env.REFRESH_SECRET!,
+  EMAIL_HOST: process.env.EMAIL_HOST!,
+  EMAIL_PORT: process.env.EMAIL_PORT!,
+  EMAIL_SECURE: process.env.EMAIL_SECURE!,
+  EMAIL_USER: process.env.EMAIL_USER!,
+  EMAIL_PASS: process.env.EMAIL_PASS!,
 };

@@ -6,6 +6,8 @@ import { CustomError } from "@/lib/customError";
 import idSchema from "../idSchema";
 import OptimisedImage from "@/services/ImageService";
 import OtpService from "@/services/otpService";
+import Mailer from "@/services/emailService";
+import { removeFields } from "@/lib/helpers";
 
 class UserController {
   async get(req: Request, res: Response) {
@@ -30,28 +32,35 @@ class UserController {
     }
 
     const otpService = new OtpService();
-    const user = await User.create({
-      ...result,
-    });
+    const user = await User.create(result);
 
     if (!user) {
       throw new CustomError("Failed to create user", 500);
     }
 
+    const { userName, email, isVerified, role, _id } = user;
     const createdOtp = await otpService.sendOtp({
-      email: user.email,
+      email: email,
       type: "EMAIL VERIFICATION",
-      userId: user._id as string,
+      userId: _id as string,
     });
 
-    const { userName, email, isVerified, role, _id } = user;
+    const mailer = new Mailer();
+
+    await mailer.sendConfirmationOtp({
+      email,
+      userName,
+      subject: "Email verification email",
+      otpVal: createdOtp.value,
+      templateDir: ["otp-templates", "otp.ejs"],
+    });
 
     res.json(
       createResponse(
         200,
         { userName, email, isVerified, role, _id },
         "Successfully created user",
-        { otp: createdOtp },
+        { otp: removeFields(createdOtp, ["value", "expiresAt", "isUsed"]) },
       ),
     );
   }

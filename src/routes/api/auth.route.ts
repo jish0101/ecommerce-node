@@ -8,5 +8,6 @@ const authController = new AuthController();
 router.post("/login", asyncWrapper(authController.login));
 router.post("/logout", asyncWrapper(authController.logout));
 router.post("/refresh", asyncWrapper(authController.refreshToken));
+router.post("/verify-user", asyncWrapper(authController.verifyUser));
 
 export default router;

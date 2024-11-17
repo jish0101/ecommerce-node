@@ -11,3 +11,14 @@ export const asyncWrapper = (fn: ControllerFunc) => {
     fn(req, res, next).catch(next);
   };
 };
+
+export function removeFields<T extends object, K extends keyof T>(
+  obj: T,
+  fieldsToRemove: K[],
+): Omit<T, K> {
+  const newObj = { ...obj };
+  fieldsToRemove.forEach((field) => {
+    delete newObj[field];
+  });
+  return newObj;
+}

@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import { KEYS } from "@/lib/keys";
 import { Request, Response } from "express";
-import { authSchema } from "./validationSchema";
+import { authSchema, verifyUserSchema } from "./validationSchema";
 import { PayloadUser, User } from "@/models/user/user.model";
 import { CustomError } from "@/lib/customError";
 import { createResponse } from "@/lib/responseHelpers";
+import OtpService from "@/services/otpService";
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -56,6 +57,26 @@ class AuthController {
     });
 
     res.json(createResponse(200, null, "Successfully logged-out user"));
+  }
+
+  async verifyUser(req: Request, res: Response) {
+    const { _id, userId, value, type } = verifyUserSchema.parse(req.body);
+
+    const otpService = new OtpService();
+
+    const result = await otpService.verifyOtp({ _id, userId, value, type });
+
+    if (result) {
+      const updatedUser = await User.findByIdAndUpdate(userId, {
+        isVerified: true,
+      });
+
+      if (!updatedUser) {
+        throw new CustomError("Server error: failed to verify user", 500);
+      }
+    }
+
+    return res.json(createResponse(200, result, "Successfully verified user"));
   }
 
   async refreshToken(req: Request, res: Response) {
