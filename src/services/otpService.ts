@@ -14,7 +14,7 @@ type VerifyOtpOptions = Omit<
 >;
 
 class OtpService {
-  async sendOtp({ userId, email, type }: SendOtpOptions) {
+  async createOtp({ userId, email, type }: SendOtpOptions) {
     const otp = crypto.randomInt(100000, 999999).toString();
     const expiresAt = Date.now() + 5 * 60 * 1000;
 

@@ -39,7 +39,7 @@ class UserController {
     }
 
     const { userName, email, isVerified, role, _id } = user;
-    const createdOtp = await otpService.sendOtp({
+    const createdOtp = await otpService.createOtp({
       email: email,
       type: "EMAIL VERIFICATION",
       userId: _id as string,
