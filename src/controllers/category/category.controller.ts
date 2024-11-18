@@ -1,13 +1,17 @@
+import idSchema from "../idSchema";
 import { Request, Response } from "express";
-import { Category as CategoryModel } from "../../models/category/category.model";
+import { CustomError } from "@/lib/customError";
+import { paginationSchema } from "../paginationSchema";
 import { createResponse } from "@/lib/responseHelpers";
 import { createCategorySchema } from "./validationSchema";
-import idSchema from "../idSchema";
-import { CustomError } from "@/lib/customError";
+import { Category as CategoryModel } from "../../models/category/category.model";
 
 class Category {
   async get(req: Request, res: Response) {
-    const categories = await CategoryModel.find();
+    const { page, limit } = paginationSchema.parse(req.query);
+    const categories = await CategoryModel.find()
+      .skip(page - 1 * limit)
+      .limit(limit);
 
     res.json(
       createResponse(200, categories, "Successfully fetched categories"),

@@ -8,19 +8,10 @@ const router = express.Router();
 const userController = new UserController();
 
 router.get("/get", checkRoles(["ADMIN"]), asyncWrapper(userController.get));
-router.post(
-  "/create",
-  checkRoles(["ADMIN"]),
-  asyncWrapper(userController.create),
-);
-router.put(
-  "/update",
-  checkRoles(["ADMIN"]),
-  asyncWrapper(userController.update),
-);
+router.post("/create", asyncWrapper(userController.create));
+router.put("/update", asyncWrapper(userController.update));
 router.put(
   "/profile",
-  checkRoles(["ADMIN"]),
   multerInstance.single("profile"),
   asyncWrapper(userController.updateProfile),
 );

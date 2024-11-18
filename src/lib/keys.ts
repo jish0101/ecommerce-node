@@ -16,4 +16,7 @@ export const KEYS: Record<string, string> = {
   EMAIL_SECURE: process.env.EMAIL_SECURE!,
   EMAIL_USER: process.env.EMAIL_USER!,
   EMAIL_PASS: process.env.EMAIL_PASS!,
+  RAZOR_PAY_KEY_ID: process.env.RAZOR_PAY_KEY_ID!,
+  RAZOR_PAY_KEY_SECRET: process.env.RAZOR_PAY_KEY_SECRET!,
+  CLIENT_BASE_URL: process.env.CLIENT_BASE_URL!,
 };

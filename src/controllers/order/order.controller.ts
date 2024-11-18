@@ -10,6 +10,7 @@ import {
 import { Address } from "@/models/address/address.model";
 import { Product } from "@/models/product/product.model";
 import { PayloadUserWithID } from "@/models/user/user.model";
+import { paginationSchema } from "../paginationSchema";
 
 class OrderController {
   async create(req: Request, res: Response) {
@@ -85,15 +86,20 @@ class OrderController {
   }
   async get(req: Request, res: Response) {
     const user = req.user as PayloadUserWithID;
-    const orders = await Order.find({ customer: user._id });
+    const { page, limit } = paginationSchema.parse(req.query);
+
+    const orders = await Order.find({ customer: user._id })
+      .skip(page - 1 * limit)
+      .limit(limit);
 
     return res.json(createResponse(200, orders, "Successfully fetched orders"));
   }
   async update(req: Request, res: Response) {
+    const payloadUser = req.user as PayloadUserWithID;
     const { status, orderId } = updateOrderSchema.parse(req.body);
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
+    const updatedOrder = await Order.findOneAndUpdate(
+      { $and: [{ _id: orderId }, { customer: payloadUser._id }] },
       {
         status,
       },
@@ -107,9 +113,12 @@ class OrderController {
     );
   }
   async delete(req: Request, res: Response) {
+    const user = req.user as PayloadUserWithID;
     const { orderId } = deletedOrderSchema.parse(req.query);
 
-    const deletedOrder = await Order.findByIdAndDelete(orderId).lean();
+    const deletedOrder = await Order.findOneAndDelete({
+      $and: [{ _id: orderId }, { customer: user._id }],
+    }).lean();
 
     return res.json(
       createResponse(200, deletedOrder, "Successfully deleted an order"),

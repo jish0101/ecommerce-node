@@ -3,12 +3,17 @@ import { Request, Response } from "express";
 import { createResponse } from "@/lib/responseHelpers";
 import { Address } from "@/models/address/address.model";
 import { createAddressSchema } from "./validationSchema";
-import { PayloadUser } from "@/models/user/user.model";
+import { PayloadUser, PayloadUserWithID } from "@/models/user/user.model";
 import { CustomError } from "@/lib/customError";
+import { paginationSchema } from "../paginationSchema";
 
 class AddressController {
   async get(req: Request, res: Response) {
-    const data = await Address.find();
+    const { page, limit } = paginationSchema.parse(req.query);
+
+    const data = await Address.find()
+      .skip(page - 1 * limit)
+      .limit(limit);
 
     res.json(createResponse(200, data, "Successfully fetched addresses"));
   }
@@ -35,11 +40,14 @@ class AddressController {
     );
   }
   async update(req: Request, res: Response) {
+    const user = req.user as PayloadUserWithID;
     const payload = createAddressSchema.merge(idSchema).parse(req.body);
-    const user = req.user as PayloadUser & { _id: string };
 
     if (payload.isPrimary === true) {
-      await Address.findOneAndUpdate({ isPrimary: true }, { isPrimary: false });
+      await Address.findOneAndUpdate(
+        { user: user._id, isPrimary: true },
+        { isPrimary: false },
+      );
     }
 
     const updatedAddress = await Address.findOneAndUpdate(

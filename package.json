@@ -65,6 +65,7 @@
     "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "razorpay": "^2.9.5",
     "sharp": "^0.33.5",
     "socket.io": "^4.7.5",
     "tsconfig-paths": "^4.2.0",

@@ -1,17 +1,22 @@
 import { Request, Response } from "express";
 import { createResponse } from "../../lib/responseHelpers";
 import { createUserSchema, updateUserSchema } from "./validationSchema";
-import { PayloadUser, User } from "@/models/user/user.model";
+import { PayloadUser, PayloadUserWithID, User } from "@/models/user/user.model";
 import { CustomError } from "@/lib/customError";
 import idSchema from "../idSchema";
 import OptimisedImage from "@/services/ImageService";
 import OtpService from "@/services/otpService";
 import Mailer from "@/services/emailService";
 import { removeFields } from "@/lib/helpers";
+import { paginationSchema } from "../paginationSchema";
 
 class UserController {
   async get(req: Request, res: Response) {
+    const { page, limit } = paginationSchema.parse(req.query);
+
     const users = await User.find()
+      .skip(page - 1 * limit)
+      .limit(limit)
       .select("-password -__v -refreshToken")
       .lean();
 
@@ -63,9 +68,10 @@ class UserController {
     );
   }
   async update(req: Request, res: Response) {
+    const payloadUser = req.user as PayloadUserWithID;
     const body = updateUserSchema.parse(req.body);
 
-    const user = await User.findById(body._id);
+    const user = await User.findById(payloadUser._id);
 
     if (!user) {
       throw new CustomError("User not found", 404);
@@ -75,13 +81,25 @@ class UserController {
     if (user.email !== body.email) {
       if (!body.otp_id || !body.otp_value) {
         throw new CustomError(
-          "Email cannot be changed with otp_id/otp_value",
+          "Email cannot be changed without otp_id, otp_value",
           400,
         );
       }
+
+      // check if anothe user has same email if yes return
+      const existingUser = await User.findOne({ email: body.email });
+
+      if (existingUser) {
+        throw new CustomError(
+          "Email cannot be changed, duplicate user found.",
+          400,
+        );
+      }
+
       const otpService = new OtpService();
+
       await otpService.verifyOtp({
-        _id: body._id,
+        _id: body.otp_id,
         value: body.otp_value,
         type: "EMAIL VERIFICATION",
         userId: user._id as string,
@@ -89,7 +107,7 @@ class UserController {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      body._id,
+      payloadUser._id,
       {
         userName: body.userName,
         email: body.email,
@@ -103,9 +121,7 @@ class UserController {
       throw new CustomError("Server error", 500);
     }
 
-    const { password, ...data } = updatedUser;
-
-    res.json(createResponse(200, data, "Successfully updated user"));
+    res.json(createResponse(200, updatedUser, "Successfully updated user"));
   }
   async updateProfile(req: Request, res: Response) {
     if (!req.file) {

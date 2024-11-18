@@ -1,8 +1,8 @@
 import express from "express";
 import { KEYS } from "../lib/keys";
 import apiRoutes from "./api/routes";
-import { authenticateJwt } from "@/middlewares/passport";
 import authRouter from "./api/auth.route";
+import { authenticateJwt } from "@/middlewares/passport";
 
 const { API_ROUTE } = KEYS;
 const router = express.Router();

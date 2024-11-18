@@ -6,10 +6,15 @@ import { PayloadUserWithID } from "@/models/user/user.model";
 import idSchema from "../idSchema";
 import { CustomError } from "@/lib/customError";
 import OptimisedImage from "@/services/ImageService";
+import { paginationSchema } from "../paginationSchema";
 
 class ProductController {
   async get(req: Request, res: Response) {
-    const products = await Product.find();
+    const { page, limit } = paginationSchema.parse(req.query);
+
+    const products = await Product.find()
+      .skip(page - 1 * limit)
+      .limit(limit);
 
     return res.json(
       createResponse(200, products, "Successfully fetched products"),

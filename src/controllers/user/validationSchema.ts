@@ -17,7 +17,6 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-  _id: z.string(),
   userName: z.string().min(4, "userName should be at least 4 character long"),
   email: z.string().email("email format is not valid"),
   otp_id: z.string().optional(),

@@ -1,9 +1,26 @@
-import mongoose from "mongoose";
+import { IUser } from "../user/user.model";
+import mongoose, { Document, Schema, Model } from "mongoose";
 
-const orderItemSchema = new mongoose.Schema({
+interface OrderItem {
+  productId: mongoose.Schema.Types.ObjectId;
+  quantity: number;
+}
+
+interface OrderDocument extends Document {
+  customer: IUser | mongoose.Schema.Types.ObjectId;
+  orderPrice: number;
+  orderItems: OrderItem[];
+  address: string;
+  status: "PENDING" | "CANCELLED" | "DELIVERED";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const orderItemSchema = new Schema<OrderItem>({
   productId: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Product",
+    required: true,
   },
   quantity: {
     type: Number,
@@ -11,10 +28,10 @@ const orderItemSchema = new mongoose.Schema({
   },
 });
 
-const orderSchema = new mongoose.Schema(
+const orderSchema = new Schema<OrderDocument>(
   {
     customer: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -39,4 +56,9 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export const Order = mongoose.model("Order", orderSchema);
+const Order: Model<OrderDocument> = mongoose.model<OrderDocument>(
+  "Order",
+  orderSchema,
+);
+
+export { Order, OrderDocument };
