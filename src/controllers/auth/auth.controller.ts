@@ -6,13 +6,14 @@ import {
   sendOtpSchema,
   verifyUserSchema,
 } from "./validationSchema";
-import { PayloadUser, User } from "@/models/user/user.model";
+import { PayloadUserWithID, User } from "@/models/user/user.model";
 import { CustomError } from "@/lib/customError";
 import { createResponse } from "@/lib/responseHelpers";
 import OtpService from "@/services/otpService";
 import Mailer from "@/services/emailService";
 import { removeFields } from "@/lib/helpers";
 import { Otp } from "@/models/otp/Otp";
+import TokenService from "@/services/tokenService";
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -25,7 +26,7 @@ class AuthController {
     }
 
     const { email, userName, _id, isVerified, role, profileImage } = user;
-    const payloadUser: PayloadUser & { _id: string; accessToken?: string } = {
+    const payloadUser: PayloadUserWithID & { accessToken?: string } = {
       _id: String(_id),
       email,
       isVerified,
@@ -33,8 +34,11 @@ class AuthController {
       userName,
       profileImage,
     };
-    const accessToken = getToken(payloadUser, "access");
-    const refreshToken = getToken(payloadUser, "refresh");
+
+    const tokens = new TokenService();
+
+    const accessToken = tokens.getToken(payloadUser, "access");
+    const refreshToken = tokens.getToken(payloadUser, "refresh");
 
     user.refreshToken = refreshToken;
 
@@ -73,10 +77,9 @@ class AuthController {
       throw new CustomError("Credentials are not valid", 400);
     }
 
-    const isOk = jwt.verify(
-      cookies.refresh_token,
-      KEYS.REFRESH_SECRET,
-    ) as PayloadUser & { _id: string };
+    const tokens = new TokenService();
+
+    const isOk = tokens.verifyToken(cookies.refresh_token);
 
     if (!isOk) {
       throw new CustomError("Credentials are not valid", 400);
@@ -84,7 +87,7 @@ class AuthController {
 
     const { _id, email, isVerified, role, userName, profileImage } = isOk;
 
-    const accessToken = getToken(
+    const accessToken = tokens.getToken(
       { _id, email, isVerified, role, userName, profileImage },
       "access",
     );
@@ -192,17 +195,5 @@ class AuthController {
     );
   }
 }
-
-const getToken = (
-  payload: PayloadUser & { _id: string; accessToken?: string },
-  t: "access" | "refresh",
-) => {
-  if (t === "access") {
-    return jwt.sign(payload, KEYS.JWT_SECRET, { expiresIn: "1d" });
-  }
-  if (t === "refresh") {
-    return jwt.sign(payload, KEYS.REFRESH_SECRET, { expiresIn: "1d" });
-  }
-};
 
 export default AuthController;

@@ -16,8 +16,6 @@ export function createResponse<T>(
   let res: ResponseT<T> = {
     status,
     message,
-    data,
-    stack,
   };
   if (data) {
     res.data = data;

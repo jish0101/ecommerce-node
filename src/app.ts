@@ -4,7 +4,9 @@ import morgan from "morgan";
 import helmet from "helmet";
 import express from "express";
 import passport from "passport";
+import { KEYS } from "./lib/keys";
 import routes from "./routes/index";
+import session from "express-session";
 import cookieParser from "cookie-parser";
 import corsOption from "./lib/corsOptions";
 import { rateLimit } from "express-rate-limit";
@@ -30,13 +32,23 @@ app.use(
     frameguard: true,
   }),
 );
+
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(
+  session({
+    secret: KEYS.REFRESH_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  }),
+);
 app.use(credentials);
 app.use(cors(corsOption));
-app.use(passport.initialize());
-app.use(morgan("common"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(morgan("common"));
 app.use(cookieParser());
 app.use(routes);
 
