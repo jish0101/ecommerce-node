@@ -1,6 +1,6 @@
 import express from "express";
-import { rateLimit } from "express-rate-limit";
 import { asyncWrapper } from "@/lib/helpers";
+import { rateLimit } from "express-rate-limit";
 import AuthController from "@/controllers/auth/auth.controller";
 import { authenticateGoogle, authGoogleCallback } from "@/middlewares/passport";
 import GoogleAuthController from "@/controllers/google-auth/googleAuth.controller";
@@ -31,8 +31,22 @@ router.post(
 );
 
 // Google Auth Routes
-router.get("/google", authenticateGoogle());
-router.get("/google/callback", authGoogleCallback());
+router.get(
+  "/google",
+  (req, res, next) => {
+    console.log("FIRST");
+    next();
+  },
+  authenticateGoogle(),
+);
+router.get(
+  "/google/callback",
+  (req, res, next) => {
+    console.log("SECOND");
+    next();
+  },
+  authGoogleCallback(),
+);
 
 // Google Auth Success and Failure
 router.post("/google/failure", googleAuthController.handleFailure);
