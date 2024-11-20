@@ -20,14 +20,14 @@ const jwtStrategy = new JwtStrategy(options, async (jwtPayload, done) => {
         _id: String(user._id),
         role: user.role,
         email: user.email,
-        userName: user.userName,
+        userType: user.userType,
+        fullName: user.fullName,
         isVerified: user.isVerified,
         profileImage: user.profileImage,
       };
       return done(null, payloadUser);
-    } else {
-      return done(null, false);
     }
+    return done(null, false);
   } catch (error) {
     return done(error, false);
   }

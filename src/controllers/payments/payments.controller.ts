@@ -50,7 +50,7 @@ class PaymentsController {
         amount: orderDoc.orderPrice * 100,
         key_id: KEYS.RAZOR_PAY_KEY_ID,
         contact: (orderDoc.customer as IUser).email,
-        name: (orderDoc.customer as IUser).userName,
+        name: (orderDoc.customer as IUser).fullName,
         email: (orderDoc.customer as IUser).email,
       };
 

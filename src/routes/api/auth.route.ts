@@ -10,46 +10,31 @@ const authController = new AuthController();
 const googleAuthController = new GoogleAuthController();
 
 const strictRateLimiter = rateLimit({
-  windowMs: 2 * 60 * 1000, // 2 minutes
-  max: 1, // only 1 request allowed within the time window
-  message:
-    "You can only make one request every 2 minutes. Please try again later.",
+  windowMs: 2 * 60 * 1000,
+  max: 1,
+  message: "One request in 2 minutes allowed. Try again later.",
 });
 
-// Auth Routes
+// Auth routes
 router.post("/login", asyncWrapper(authController.login));
 router.post("/logout", asyncWrapper(authController.logout));
 router.post("/refresh", asyncWrapper(authController.refreshToken));
 router.post("/verify-user", asyncWrapper(authController.verifyUser));
 router.post("/reset-password", asyncWrapper(authController.resetPassword));
 
-// OTP Sending with rate limit
+// OTP sending endpoint with rate limit
 router.post(
   "/send-otp",
   strictRateLimiter,
   asyncWrapper(authController.sendOtp),
 );
 
-// Google Auth Routes
-router.get(
-  "/google",
-  (req, res, next) => {
-    console.log("FIRST");
-    next();
-  },
-  authenticateGoogle(),
-);
+// Google auth routes
+router.get("/google", authenticateGoogle());
 router.get(
   "/google/callback",
-  (req, res, next) => {
-    console.log("SECOND");
-    next();
-  },
   authGoogleCallback(),
+  googleAuthController.handleSuccess,
 );
-
-// Google Auth Success and Failure
-router.post("/google/failure", googleAuthController.handleFailure);
-router.post("/google/success", googleAuthController.handleSuccess);
 
 export default router;

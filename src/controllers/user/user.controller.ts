@@ -15,7 +15,7 @@ class UserController {
     const { page, limit } = paginationSchema.parse(req.query);
 
     const users = await User.find()
-      .skip(page - 1 * limit)
+      .skip((page - 1) * limit)
       .limit(limit)
       .select("-password -__v -refreshToken")
       .lean();
@@ -43,7 +43,7 @@ class UserController {
       throw new CustomError("Failed to create user", 500);
     }
 
-    const { userName, email, isVerified, role, _id } = user;
+    const { fullName, email, isVerified, role, _id } = user;
     const createdOtp = await otpService.createOtp({
       type: "EMAIL VERIFICATION",
       userId: _id as string,
@@ -53,7 +53,7 @@ class UserController {
 
     await mailer.sendConfirmationOtp({
       email,
-      userName,
+      userName: fullName,
       type: createdOtp.type,
       otpVal: createdOtp.value,
     });
@@ -61,7 +61,7 @@ class UserController {
     res.json(
       createResponse(
         200,
-        { userName, email, isVerified, role, _id },
+        { fullName, email, isVerified, role, _id },
         "Successfully created user",
         { otp: removeFields(createdOtp, ["value", "expiresAt", "isUsed"]) },
       ),

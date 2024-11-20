@@ -3,12 +3,13 @@ import path from "path";
 import morgan from "morgan";
 import helmet from "helmet";
 import express from "express";
-import passport from "passport";
-import { KEYS } from "./lib/keys";
 import routes from "./routes/index";
-import session from "express-session";
+// import { KEYS } from "./lib/keys";
+// import session from "express-session";
+// import sessionOptions from "./lib/sessionConfig";
 import cookieParser from "cookie-parser";
 import corsOption from "./lib/corsOptions";
+import passport from "./middlewares/passport";
 import { rateLimit } from "express-rate-limit";
 import { createResponse } from "./lib/responseHelpers";
 import { credentials } from "./middlewares/credentials";
@@ -32,22 +33,12 @@ app.use(
     frameguard: true,
   }),
 );
-
-app.use(express.static(path.join(__dirname, "public")));
-
-app.use(
-  session({
-    secret: KEYS.REFRESH_SECRET,
-    resave: false,
-    saveUninitialized: true,
-  }),
-);
 app.use(credentials);
 app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(passport.initialize());
-app.use(passport.session());
 app.use(morgan("common"));
 app.use(cookieParser());
 app.use(routes);

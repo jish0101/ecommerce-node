@@ -1,27 +1,29 @@
 import mongoose, { Document } from "mongoose";
 
+export type UserType = "jwt" | "google";
 export type UserRoles = "ADMIN" | "USER";
 
 export interface IUser extends Document {
-  userName: string;
+  fullName: string;
   email: string;
   password: string;
   isVerified: boolean;
   refreshToken?: string;
   profileImage?: string;
   role: UserRoles;
+  userType: UserType;
 }
 
 export type PayloadUser = Pick<
   IUser,
-  "userName" | "email" | "isVerified" | "role" | "profileImage"
+  "fullName" | "email" | "isVerified" | "role" | "profileImage" | "userType"
 >;
 
 export type PayloadUserWithID = PayloadUser & { _id: string };
 
 const userSchema = new mongoose.Schema<IUser>(
   {
-    userName: {
+    fullName: {
       type: String,
       required: true,
       unique: true,
@@ -35,7 +37,7 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     isVerified: {
       type: Boolean,
@@ -52,6 +54,11 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     profileImage: {
       type: String,
+    },
+    userType: {
+      type: String,
+      enum: ["jwt", "google"],
+      default: "jwt",
     },
   },
   { timestamps: true },

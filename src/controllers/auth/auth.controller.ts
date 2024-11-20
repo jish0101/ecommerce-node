@@ -1,19 +1,17 @@
-import jwt from "jsonwebtoken";
-import { KEYS } from "@/lib/keys";
 import { Request, Response } from "express";
 import {
   authSchema,
   sendOtpSchema,
   verifyUserSchema,
 } from "./validationSchema";
-import { PayloadUserWithID, User } from "@/models/user/user.model";
-import { CustomError } from "@/lib/customError";
-import { createResponse } from "@/lib/responseHelpers";
-import OtpService from "@/services/otpService";
+import { Otp } from "@/models/otp/Otp";
 import Mailer from "@/services/emailService";
 import { removeFields } from "@/lib/helpers";
-import { Otp } from "@/models/otp/Otp";
+import { CustomError } from "@/lib/customError";
+import OtpService from "@/services/otpService";
 import TokenService from "@/services/tokenService";
+import { createResponse } from "@/lib/responseHelpers";
+import { PayloadUserWithID, User } from "@/models/user/user.model";
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -25,14 +23,16 @@ class AuthController {
       throw new CustomError("Credentials are not valid", 400);
     }
 
-    const { email, userName, _id, isVerified, role, profileImage } = user;
+    const { email, fullName, _id, isVerified, role, profileImage, userType } =
+      user;
     const payloadUser: PayloadUserWithID & { accessToken?: string } = {
       _id: String(_id),
       email,
       isVerified,
       role,
-      userName,
+      fullName,
       profileImage,
+      userType,
     };
 
     const tokens = new TokenService();
@@ -47,8 +47,10 @@ class AuthController {
     payloadUser.accessToken = accessToken;
 
     res.cookie("refresh_token", refreshToken, {
-      httpOnly: true,
       path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24,
     });
     res.json(createResponse(200, payloadUser, "Successfully logged-in user"));
   }
@@ -63,8 +65,10 @@ class AuthController {
     }
 
     res.clearCookie("refresh_token", {
-      httpOnly: true,
       path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
     res.json(createResponse(200, null, "Successfully logged-out user"));
@@ -85,10 +89,11 @@ class AuthController {
       throw new CustomError("Credentials are not valid", 400);
     }
 
-    const { _id, email, isVerified, role, userName, profileImage } = isOk;
+    const { _id, email, isVerified, role, fullName, profileImage, userType } =
+      isOk;
 
     const accessToken = tokens.getToken(
-      { _id, email, isVerified, role, userName, profileImage },
+      { _id, email, isVerified, role, fullName, profileImage, userType },
       "access",
     );
 
@@ -180,7 +185,7 @@ class AuthController {
     await mailer.sendConfirmationOtp({
       email,
       otpVal: createdOtp.value,
-      userName: user.userName,
+      userName: user.fullName,
       type,
     });
 
