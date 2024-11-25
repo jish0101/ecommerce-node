@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.KEYS = void 0;
 const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config({
+dotenv_1.default.config(process.env.NODE_ENV === "development" ? {
     path: path_1.default.resolve(__dirname, "..", "..", ".env"),
-});
+} : undefined);
 exports.KEYS = {
     PORT: process.env.PORT,
     API_ROUTE: process.env.API_ROUTE,
@@ -27,4 +27,5 @@ exports.KEYS = {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 };
+console.log("🚀 ~ KEYS:", exports.KEYS);
 //# sourceMappingURL=keys.js.map
