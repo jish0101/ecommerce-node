@@ -38,13 +38,17 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             const result = validationSchema_1.createUserSchema.parse(req.body);
             const isAlreadyExisting = yield user_model_1.User.findOne({
-                $or: [{ email: result.email }, { userName: result.userName }],
+                $or: [{ email: result.email }],
             });
             if (isAlreadyExisting) {
                 throw new customError_1.CustomError("User with this email/username already exists", 400);
             }
             const otpService = new otpService_1.default();
-            const user = yield user_model_1.User.create(result);
+            const user = yield user_model_1.User.create({
+                fullName: `${result.firstName} ${result.lastName}`,
+                email: result.email,
+                password: result.password,
+            });
             if (!user) {
                 throw new customError_1.CustomError("Failed to create user", 500);
             }

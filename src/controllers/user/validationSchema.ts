@@ -3,7 +3,8 @@ import bcryptjs from "bcryptjs";
 import { PASSWORD_REGEX } from "@/lib/regex";
 
 export const createUserSchema = z.object({
-  userName: z.string().min(4, "userName should be at least 4 character long"),
+  firstName: z.string().trim().min(1, "First name is required").max(100, "First name cannot be more than 100 characters"),
+  lastName: z.string().trim().min(1, "First name is required").max(100, "First name cannot be more than 100 characters"),
   email: z.string().email("email format is not valid"),
   password: z
     .string()

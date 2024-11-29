@@ -25,23 +25,22 @@ const userSchema = new mongoose.Schema<IUser>(
   {
     fullName: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
+      required: true,
     },
     email: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
+      required: true,
     },
     password: {
       type: String,
-      required: false,
+      required: true,
     },
     isVerified: {
       type: Boolean,
-      required: true,
       default: false,
     },
     role: {
@@ -51,9 +50,11 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     refreshToken: {
       type: String,
+      required: false,
     },
     profileImage: {
       type: String,
+      required: false,
     },
     userType: {
       type: String,

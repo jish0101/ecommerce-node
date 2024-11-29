@@ -8,23 +8,22 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const userSchema = new mongoose_1.default.Schema({
     fullName: {
         type: String,
-        required: true,
         unique: true,
         lowercase: true,
+        required: true,
     },
     email: {
         type: String,
-        required: true,
         unique: true,
         lowercase: true,
+        required: true,
     },
     password: {
         type: String,
-        required: false,
+        required: true,
     },
     isVerified: {
         type: Boolean,
-        required: true,
         default: false,
     },
     role: {
@@ -34,9 +33,11 @@ const userSchema = new mongoose_1.default.Schema({
     },
     refreshToken: {
         type: String,
+        required: false,
     },
     profileImage: {
         type: String,
+        required: false,
     },
     userType: {
         type: String,

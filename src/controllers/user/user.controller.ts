@@ -26,7 +26,7 @@ class UserController {
     const result = createUserSchema.parse(req.body);
 
     const isAlreadyExisting = await User.findOne({
-      $or: [{ email: result.email }, { userName: result.userName }],
+      $or: [{ email: result.email }],
     });
 
     if (isAlreadyExisting) {
@@ -37,7 +37,11 @@ class UserController {
     }
 
     const otpService = new OtpService();
-    const user = await User.create(result);
+    const user = await User.create({
+      fullName: `${result.firstName} ${result.lastName}`,
+      email: result.email,
+      password: result.password,
+    });
 
     if (!user) {
       throw new CustomError("Failed to create user", 500);
