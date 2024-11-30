@@ -11,7 +11,7 @@
     "lint": "eslint src/**/*.{js,jsx,ts,tsx,json,md}",
     "prettier": "npx prettier --write src/**/*.{js,jsx,ts,tsx,json,md}",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
-    "build": "rimraf dist && tsc -p tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist"
+    "build": "rimraf dist && tsc -p tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist && copyfiles -u 1 src/templates/**/* dist/templates"
   },
   "pre-commit": [
     "ts.check",
@@ -41,6 +41,7 @@
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.5.0",
     "@typescript-eslint/parser": "^8.5.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
