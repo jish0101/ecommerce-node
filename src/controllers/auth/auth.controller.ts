@@ -18,13 +18,14 @@ class AuthController {
     const result = authSchema.parse(req.body);
 
     const user = await User.findOne({ email: result.email });
-
+    
     if (!user) {
       throw new CustomError("Credentials are not valid", 400);
     }
 
     const { email, fullName, _id, isVerified, role, profileImage, userType } =
       user;
+
     const payloadUser: PayloadUserWithID & { accessToken?: string } = {
       _id: String(_id),
       email,
@@ -39,9 +40,9 @@ class AuthController {
 
     const accessToken = tokens.getToken(payloadUser, "access");
     const refreshToken = tokens.getToken(payloadUser, "refresh");
-
+    
     user.refreshToken = refreshToken;
-
+    
     await user.save();
 
     payloadUser.accessToken = accessToken;
