@@ -34,7 +34,12 @@ app.use(
   }),
 );
 app.use(credentials);
-app.use(cors(corsOption));
+app.use(cors({
+  origin: function (origin, callback) {
+    console.log("origin ", origin)
+    callback(null, true);
+  },
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
