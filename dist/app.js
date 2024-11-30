@@ -13,6 +13,7 @@ const index_1 = __importDefault(require("./routes/index"));
 // import session from "express-session";
 // import sessionOptions from "./lib/sessionConfig";
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const corsOptions_1 = __importDefault(require("./lib/corsOptions"));
 const passport_1 = __importDefault(require("./middlewares/passport"));
 const express_rate_limit_1 = require("express-rate-limit");
 const responseHelpers_1 = require("./lib/responseHelpers");
@@ -31,12 +32,7 @@ app.use((0, helmet_1.default)({
     frameguard: true,
 }));
 app.use(credentials_1.credentials);
-app.use((0, cors_1.default)({
-    origin: function (origin, callback) {
-        console.log("origin ", origin);
-        callback(null, true);
-    },
-}));
+app.use((0, cors_1.default)(corsOptions_1.default));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static(path_1.default.join(__dirname, "public")));
