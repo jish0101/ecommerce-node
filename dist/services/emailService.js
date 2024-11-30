@@ -33,7 +33,7 @@ class Mailer {
             yield ejs_1.default.renderFile(path_1.default.resolve(__dirname, "..", "templates", ...templateDir[type]), { userName, otpVal }, function (err, html) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (err) {
-                        throw new customError_1.CustomError("Server error: failed to send otp", 500);
+                        throw new customError_1.CustomError(`Server error: ${err.message}`, 500);
                     }
                     yield transporter.sendMail({
                         from: `"Joy" ${keys_1.KEYS.EMAIL_USER}`,

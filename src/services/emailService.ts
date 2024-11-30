@@ -32,7 +32,7 @@ class Mailer {
       { userName, otpVal },
       async function (err, html) {
         if (err) {
-          throw new CustomError("Server error: failed to send otp", 500);
+          throw new CustomError(`Server error: ${err.message}`, 500);
         }
         await transporter.sendMail({
           from: `"Joy" ${KEYS.EMAIL_USER}`,
