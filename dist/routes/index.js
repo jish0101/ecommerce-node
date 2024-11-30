@@ -13,7 +13,7 @@ const { API_ROUTE } = keys_1.KEYS;
 const router = express_1.default.Router();
 // unprotected/partially-protected routes
 router.use("/auth", auth_route_1.default);
-router.use("/users", user_route_1.default);
+router.use("/api/users", user_route_1.default);
 // protected routes
 router.use(API_ROUTE, (0, passport_1.authenticateJwt)());
 router.use(API_ROUTE, routes_1.default);
