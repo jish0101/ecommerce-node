@@ -1,6 +1,7 @@
 import { CorsOptions } from "cors";
 
 export const allowedOrigins = [
+  "https://ecommerce-ts-react.vercel.app",
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:8080",
