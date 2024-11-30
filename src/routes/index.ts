@@ -10,7 +10,7 @@ const router = express.Router();
 
 // unprotected/partially-protected routes
 router.use("/auth", authRouter);
-router.use("/users", userRouter);
+router.use("/api/users", userRouter);
 
 // protected routes
 router.use(API_ROUTE, authenticateJwt());
