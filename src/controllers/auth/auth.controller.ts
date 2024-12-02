@@ -193,10 +193,11 @@ class AuthController {
     return res.json(
       createResponse(
         200,
+        true,
+        `Successfully sent an otp to ${email}`,
         {
           otp: removeFields(createdOtp, ["value", "expiresAt", "isUsed"]),
-        },
-        `Successfully sent an otp to ${email}`,
+        }
       ),
     );
   }

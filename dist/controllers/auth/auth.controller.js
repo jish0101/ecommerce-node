@@ -145,9 +145,9 @@ class AuthController {
                 userName: user.fullName,
                 type,
             });
-            return res.json((0, responseHelpers_1.createResponse)(200, {
+            return res.json((0, responseHelpers_1.createResponse)(200, true, `Successfully sent an otp to ${email}`, {
                 otp: (0, helpers_1.removeFields)(createdOtp, ["value", "expiresAt", "isUsed"]),
-            }, `Successfully sent an otp to ${email}`));
+            }));
         });
     }
 }
