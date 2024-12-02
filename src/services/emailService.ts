@@ -23,29 +23,33 @@ const templateDir: Record<OtpAction, string[]> = {
 };
 
 class Mailer {
-  async sendConfirmationOtp(config: SendConfirmationOtpConfig) {
+  async sendConfirmationOtp(config: SendConfirmationOtpConfig): Promise<boolean> {
     const transporter = createTransporter();
     const { email, otpVal, userName, type } = config;
 
-    return await ejs.renderFile(
-      path.resolve(__dirname, "..", "templates", ...templateDir[type]),
-      { userName, otpVal },
-      async function (err, html) {
-        if (err) {
-          throw new CustomError(`Server error: ${err.message}`, 500);
+    const html = await new Promise<string>((resolve, reject) => {
+      ejs.renderFile(
+        path.resolve(__dirname, "..", "templates", ...templateDir[type]),
+        { userName, otpVal },
+        (err, renderedHtml) => {
+          if (err) {
+            reject(new CustomError(`Template rendering error: ${err.message}`, 500));
+          } else {
+            resolve(renderedHtml);
+          }
         }
-        const sentMail = await transporter.sendMail({
-          from: `"Joy" ${KEYS.EMAIL_USER}`,
-          to: email,
-          subject: otpTypeSubjectMap[type],
-          html,
-        });
-        console.info(
-          `Successfully sent an email to ${email} of type: ${templateDir[type].toString()}`,
-        );
-        return !!sentMail;
-      },
-    );
+      );
+    });
+
+    const sentMail = await transporter.sendMail({
+      from: `"Joy" <${KEYS.EMAIL_USER}>`,
+      to: email,
+      subject: otpTypeSubjectMap[type],
+      html,
+    });
+
+    console.info(`Successfully sent an email to ${email} of type: ${type}`);
+    return !!sentMail;
   }
 }
 
