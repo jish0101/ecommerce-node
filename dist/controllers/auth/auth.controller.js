@@ -132,7 +132,10 @@ class AuthController {
             const otpService = new otpService_1.default();
             const user = yield user_model_1.User.findOne({ email });
             if (!user) {
-                throw new customError_1.CustomError("User not found", 404);
+                throw new customError_1.CustomError("User not found", 404, false);
+            }
+            if (user.isVerified && type === "EMAIL VERIFICATION") {
+                throw new customError_1.CustomError("User is already verified", 400, false);
             }
             const createdOtp = yield otpService.createOtp({
                 userId: user._id,

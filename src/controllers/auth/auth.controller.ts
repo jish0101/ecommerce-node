@@ -173,7 +173,11 @@ class AuthController {
     const user = await User.findOne({ email });
 
     if (!user) {
-      throw new CustomError("User not found", 404);
+      throw new CustomError("User not found", 404, false);
+    }
+
+    if (user.isVerified && type === "EMAIL VERIFICATION") {
+      throw new CustomError("User is already verified", 400, false);
     }
 
     const createdOtp = await otpService.createOtp({

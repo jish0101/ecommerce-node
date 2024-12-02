@@ -17,10 +17,10 @@ export const errorHandler = (
 
   const statusCode = err instanceof CustomError ? err.statusCode : 500;
   const message = err.message || "Internal Server Error";
-  const details =
-    err instanceof CustomError && err.details ? err.details : null;
+  const details = err instanceof CustomError && err.details ? err.details : null;
+  const data = err instanceof CustomError && err.data ? err.data : null;
 
   res
     .status(statusCode)
-    .json(createResponse(statusCode, null, message, details));
+    .json(createResponse(statusCode, data, message, details));
 };
