@@ -55,12 +55,16 @@ class UserController {
 
     const mailer = new Mailer();
 
-    await mailer.sendConfirmationOtp({
+    const emailSent = await mailer.sendConfirmationOtp({
       email,
       userName: fullName,
       type: createdOtp.type,
       otpVal: createdOtp.value,
     });
+
+    if (!emailSent) {
+      throw new CustomError("Failed to send otp", 500)
+    }
 
     res.json(
       createResponse(

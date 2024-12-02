@@ -27,14 +27,14 @@ class Mailer {
     const transporter = createTransporter();
     const { email, otpVal, userName, type } = config;
 
-    await ejs.renderFile(
+    return await ejs.renderFile(
       path.resolve(__dirname, "..", "templates", ...templateDir[type]),
       { userName, otpVal },
       async function (err, html) {
         if (err) {
           throw new CustomError(`Server error: ${err.message}`, 500);
         }
-        await transporter.sendMail({
+        const sentMail = await transporter.sendMail({
           from: `"Joy" ${KEYS.EMAIL_USER}`,
           to: email,
           subject: otpTypeSubjectMap[type],
@@ -43,6 +43,7 @@ class Mailer {
         console.info(
           `Successfully sent an email to ${email} of type: ${templateDir[type].toString()}`,
         );
+        return !!sentMail;
       },
     );
   }
