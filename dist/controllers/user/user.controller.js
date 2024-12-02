@@ -58,12 +58,15 @@ class UserController {
                 userId: _id,
             });
             const mailer = new emailService_1.default();
-            yield mailer.sendConfirmationOtp({
+            const emailSent = yield mailer.sendConfirmationOtp({
                 email,
                 userName: fullName,
                 type: createdOtp.type,
                 otpVal: createdOtp.value,
             });
+            if (!emailSent) {
+                throw new customError_1.CustomError("Failed to send otp", 500);
+            }
             res.json((0, responseHelpers_1.createResponse)(200, { fullName, email, isVerified, role, _id }, "Successfully created user", { otp: (0, helpers_1.removeFields)(createdOtp, ["value", "expiresAt", "isUsed"]) }));
         });
     }

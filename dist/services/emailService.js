@@ -30,20 +30,24 @@ class Mailer {
         return __awaiter(this, void 0, void 0, function* () {
             const transporter = (0, mailTransporter_1.default)();
             const { email, otpVal, userName, type } = config;
-            yield ejs_1.default.renderFile(path_1.default.resolve(__dirname, "..", "templates", ...templateDir[type]), { userName, otpVal }, function (err, html) {
-                return __awaiter(this, void 0, void 0, function* () {
+            const html = yield new Promise((resolve, reject) => {
+                ejs_1.default.renderFile(path_1.default.resolve(__dirname, "..", "templates", ...templateDir[type]), { userName, otpVal }, (err, renderedHtml) => {
                     if (err) {
-                        throw new customError_1.CustomError(`Server error: ${err.message}`, 500);
+                        reject(new customError_1.CustomError(`Template rendering error: ${err.message}`, 500));
                     }
-                    yield transporter.sendMail({
-                        from: `"Joy" ${keys_1.KEYS.EMAIL_USER}`,
-                        to: email,
-                        subject: otpTypeSubjectMap[type],
-                        html,
-                    });
-                    console.info(`Successfully sent an email to ${email} of type: ${templateDir[type].toString()}`);
+                    else {
+                        resolve(renderedHtml);
+                    }
                 });
             });
+            const sentMail = yield transporter.sendMail({
+                from: `"Joy" <${keys_1.KEYS.EMAIL_USER}>`,
+                to: email,
+                subject: otpTypeSubjectMap[type],
+                html,
+            });
+            console.info(`Successfully sent an email to ${email} of type: ${type}`);
+            return !!sentMail;
         });
     }
 }
