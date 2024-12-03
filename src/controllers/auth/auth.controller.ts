@@ -166,11 +166,11 @@ class AuthController {
   }
 
   async sendOtp(req: Request, res: Response) {
-    const { userId, type } = sendOtpSchema.parse(req.body);
+    const { userId, email, type } = sendOtpSchema.parse(req.body);
 
     const otpService = new OtpService();
 
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ $or: [{_id: userId}, {email}] });
 
     if (!user) {
       throw new CustomError("User not found", 404, false);

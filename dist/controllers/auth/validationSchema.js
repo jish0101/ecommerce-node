@@ -30,7 +30,8 @@ exports.verifyUserSchema = zod_1.default.object({
         .transform((s) => parseInt(s, 10)),
 });
 exports.sendOtpSchema = zod_1.default.object({
-    userId: zod_1.default.string().min(1, "userId is required"),
+    email: zod_1.default.string().trim().max(100, "email is too large").optional(),
+    userId: zod_1.default.string().trim().max(100, "userId is too large").optional(),
     type: zod_1.default.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"], {
         message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
     }),

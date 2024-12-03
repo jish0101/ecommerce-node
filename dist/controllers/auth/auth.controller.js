@@ -128,9 +128,9 @@ class AuthController {
     }
     sendOtp(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { userId, type } = validationSchema_1.sendOtpSchema.parse(req.body);
+            const { userId, email, type } = validationSchema_1.sendOtpSchema.parse(req.body);
             const otpService = new otpService_1.default();
-            const user = yield user_model_1.User.findOne({ _id: userId });
+            const user = yield user_model_1.User.findOne({ $or: [{ _id: userId }, { email }] });
             if (!user) {
                 throw new customError_1.CustomError("User not found", 404, false);
             }
