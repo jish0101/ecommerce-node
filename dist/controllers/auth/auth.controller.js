@@ -128,9 +128,9 @@ class AuthController {
     }
     sendOtp(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email, type } = validationSchema_1.sendOtpSchema.parse(req.body);
+            const { userId, type } = validationSchema_1.sendOtpSchema.parse(req.body);
             const otpService = new otpService_1.default();
-            const user = yield user_model_1.User.findOne({ email });
+            const user = yield user_model_1.User.findOne({ _id: userId });
             if (!user) {
                 throw new customError_1.CustomError("User not found", 404, false);
             }
@@ -143,12 +143,12 @@ class AuthController {
             });
             const mailer = new emailService_1.default();
             yield mailer.sendConfirmationOtp({
-                email,
+                email: user.email,
                 otpVal: createdOtp.value,
                 userName: user.fullName,
                 type,
             });
-            return res.json((0, responseHelpers_1.createResponse)(200, true, `Successfully sent an otp to ${email}`, {
+            return res.json((0, responseHelpers_1.createResponse)(200, true, `Successfully sent an otp to ${user.email}`, {
                 otp: (0, helpers_1.removeFields)(createdOtp, ["value", "expiresAt", "isUsed"]),
             }));
         });

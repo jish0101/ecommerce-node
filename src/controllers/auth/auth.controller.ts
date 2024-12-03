@@ -166,11 +166,11 @@ class AuthController {
   }
 
   async sendOtp(req: Request, res: Response) {
-    const { email, type } = sendOtpSchema.parse(req.body);
+    const { userId, type } = sendOtpSchema.parse(req.body);
 
     const otpService = new OtpService();
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ _id: userId });
 
     if (!user) {
       throw new CustomError("User not found", 404, false);
@@ -188,7 +188,7 @@ class AuthController {
     const mailer = new Mailer();
 
     await mailer.sendConfirmationOtp({
-      email,
+      email: user.email,
       otpVal: createdOtp.value,
       userName: user.fullName,
       type,
@@ -198,7 +198,7 @@ class AuthController {
       createResponse(
         200,
         true,
-        `Successfully sent an otp to ${email}`,
+        `Successfully sent an otp to ${user.email}`,
         {
           otp: removeFields(createdOtp, ["value", "expiresAt", "isUsed"]),
         }

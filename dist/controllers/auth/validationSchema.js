@@ -13,7 +13,7 @@ exports.authSchema = zod_1.default.object({
 });
 exports.verifyUserSchema = zod_1.default.object({
     _id: zod_1.default.string(),
-    userId: zod_1.default.string(),
+    userId: zod_1.default.string().min(1, "userId is required"),
     password: zod_1.default
         .string()
         .optional()
@@ -30,7 +30,7 @@ exports.verifyUserSchema = zod_1.default.object({
         .transform((s) => parseInt(s, 10)),
 });
 exports.sendOtpSchema = zod_1.default.object({
-    email: zod_1.default.string().email(),
+    userId: zod_1.default.string().min(1, "userId is required"),
     type: zod_1.default.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"], {
         message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
     }),

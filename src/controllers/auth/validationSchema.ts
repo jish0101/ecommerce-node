@@ -9,7 +9,7 @@ export const authSchema = z.object({
 
 export const verifyUserSchema = z.object({
   _id: z.string(),
-  userId: z.string(),
+  userId: z.string().min(1, "userId is required"),
   password: z
     .string()
     .optional()
@@ -27,7 +27,7 @@ export const verifyUserSchema = z.object({
 });
 
 export const sendOtpSchema = z.object({
-  email: z.string().email(),
+  userId: z.string().min(1, "userId is required"),
   type: z.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"], {
     message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
   }),
