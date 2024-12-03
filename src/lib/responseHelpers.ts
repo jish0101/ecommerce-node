@@ -17,10 +17,10 @@ export function createResponse<T>(
     status,
     message,
   };
-  if (data) {
+  if (data !== undefined) {
     res.data = data;
   }
-  if (details) {
+  if (details !== undefined) {
     res.details = details;
   }
   if (stack) {

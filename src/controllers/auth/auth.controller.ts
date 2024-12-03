@@ -133,21 +133,21 @@ class AuthController {
     );
 
     if (type !== "FORGOT PASSWORD") {
-      throw new CustomError(`Otp type is invalid: ${type}`, 400);
+      throw new CustomError(`Otp type is invalid: ${type}`, 400, false);
     }
 
     if (!password) {
-      throw new CustomError(`Password is required`, 400);
+      throw new CustomError(`Password is required`, 400, false);
     }
 
     const otp = await Otp.findOne({ _id, isUsed: false });
 
     if (!otp) {
-      throw new CustomError(`Otp not found`, 404);
+      throw new CustomError(`Otp not found`, 404, false);
     }
 
     if (value !== otp.value) {
-      throw new CustomError(`Otp is not valid`, 400);
+      throw new CustomError(`Otp is not valid`, 400, false);
     }
 
     otp.isUsed = true;
@@ -157,11 +157,11 @@ class AuthController {
     const updatedUser = await User.findByIdAndUpdate(userId, { password });
 
     if (!updatedUser) {
-      throw new CustomError("Server Error: failed to reset password", 500);
+      throw new CustomError("Server Error: failed to reset password", 500, false);
     }
 
     return res.json(
-      createResponse(200, null, "Successfully updated user password"),
+      createResponse(200, true, "Successfully updated user password"),
     );
   }
 
