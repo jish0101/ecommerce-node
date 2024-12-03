@@ -114,7 +114,9 @@ class AuthController {
             if (!otp) {
                 throw new customError_1.CustomError(`Otp not found`, 404, false);
             }
-            if (value !== otp.value) {
+            const otpService = new otpService_1.default();
+            const result = yield otpService.verifyOtp({ _id, userId, value, type });
+            if (!result) {
                 throw new customError_1.CustomError(`Otp is not valid`, 400, false);
             }
             otp.isUsed = true;
