@@ -12,8 +12,8 @@ const errorHandler = (err, req, res, next) => {
     }
     const statusCode = err instanceof customError_1.CustomError ? err.statusCode : 500;
     const message = err.message || "Internal Server Error";
-    const details = err instanceof customError_1.CustomError && err.details ? err.details : null;
-    const data = err instanceof customError_1.CustomError && err.data ? err.data : null;
+    const details = err instanceof customError_1.CustomError && err.details;
+    const data = err instanceof customError_1.CustomError && err.data;
     res
         .status(statusCode)
         .json((0, responseHelpers_1.createResponse)(statusCode, data, message, details));

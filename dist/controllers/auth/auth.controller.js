@@ -105,25 +105,25 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             const { _id, userId, value, type, password } = validationSchema_1.verifyUserSchema.parse(req.body);
             if (type !== "FORGOT PASSWORD") {
-                throw new customError_1.CustomError(`Otp type is invalid: ${type}`, 400);
+                throw new customError_1.CustomError(`Otp type is invalid: ${type}`, 400, false);
             }
             if (!password) {
-                throw new customError_1.CustomError(`Password is required`, 400);
+                throw new customError_1.CustomError(`Password is required`, 400, false);
             }
             const otp = yield Otp_1.Otp.findOne({ _id, isUsed: false });
             if (!otp) {
-                throw new customError_1.CustomError(`Otp not found`, 404);
+                throw new customError_1.CustomError(`Otp not found`, 404, false);
             }
             if (value !== otp.value) {
-                throw new customError_1.CustomError(`Otp is not valid`, 400);
+                throw new customError_1.CustomError(`Otp is not valid`, 400, false);
             }
             otp.isUsed = true;
             yield otp.save();
             const updatedUser = yield user_model_1.User.findByIdAndUpdate(userId, { password });
             if (!updatedUser) {
-                throw new customError_1.CustomError("Server Error: failed to reset password", 500);
+                throw new customError_1.CustomError("Server Error: failed to reset password", 500, false);
             }
-            return res.json((0, responseHelpers_1.createResponse)(200, null, "Successfully updated user password"));
+            return res.json((0, responseHelpers_1.createResponse)(200, true, "Successfully updated user password"));
         });
     }
     sendOtp(req, res) {
