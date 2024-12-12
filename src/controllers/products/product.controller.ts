@@ -13,7 +13,7 @@ class ProductController {
     const { page, limit } = paginationSchema.parse(req.query);
 
     const products = await Product.find()
-      .skip(page - 1 * limit)
+      .skip((page - 1) * limit)
       .limit(limit);
 
     return res.json(

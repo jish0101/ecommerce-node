@@ -24,7 +24,7 @@ class ProductController {
         return __awaiter(this, void 0, void 0, function* () {
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
             const products = yield product_model_1.Product.find()
-                .skip(page - 1 * limit)
+                .skip((page - 1) * limit)
                 .limit(limit);
             return res.json((0, responseHelpers_1.createResponse)(200, products, "Successfully fetched products"));
         });
