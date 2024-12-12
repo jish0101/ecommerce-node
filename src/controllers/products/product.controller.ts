@@ -29,7 +29,8 @@ class ProductController {
 
     if (existing) {
       const img = new OptimisedImage();
-      existing.imageLinks.forEach((link) => {
+
+      result.imageLinks.forEach((link) => {
         return img.deleteImageByLink(link);
       });
 
