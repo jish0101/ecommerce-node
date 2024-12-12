@@ -36,7 +36,7 @@ class ProductController {
             const existing = yield product_model_1.Product.findOne({ name: result.name });
             if (existing) {
                 const img = new ImageService_1.default();
-                existing.imageLinks.forEach((link) => {
+                result.imageLinks.forEach((link) => {
                     return img.deleteImageByLink(link);
                 });
                 throw new customError_1.CustomError("Product already exists", 400);
