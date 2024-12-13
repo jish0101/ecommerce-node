@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.KEYS = void 0;
 const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config(process.env.NODE_ENV === "development" ? {
+dotenv_1.default.config(process.env.NODE_ENV === "production" ? undefined : {
     path: path_1.default.resolve(__dirname, "..", "..", ".env"),
-} : undefined);
+});
 exports.KEYS = {
     PORT: process.env.PORT,
     API_ROUTE: process.env.API_ROUTE,
