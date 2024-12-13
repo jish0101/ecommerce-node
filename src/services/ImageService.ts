@@ -18,8 +18,10 @@ class OptimisedImage {
   }
 
   async getProfileImg({ w, h, q, dir }: Config): Promise<string> {
-    const outDir = path.resolve(__dirname, "..", "public", dir);
     const fileName = `${Date.now()}.jpg`;
+    const outDir = process.env.IS_SERVERLESS
+    ? path.resolve("/tmp", dir)
+    : path.resolve(__dirname, "..", "public", dir);
     const resultDir = path.join(outDir, fileName);
 
     if (!existsSync(outDir)) {

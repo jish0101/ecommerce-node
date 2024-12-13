@@ -20,7 +20,6 @@ class ProductController {
       createResponse(200, products, "Successfully fetched products"),
     );
   }
-
   async create(req: Request, res: Response) {
     const user = req.user as PayloadUserWithID;
     const result = createProductSchema.parse(req.body);

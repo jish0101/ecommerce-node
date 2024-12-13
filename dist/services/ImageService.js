@@ -23,8 +23,10 @@ class OptimisedImage {
     getProfileImg(_a) {
         return __awaiter(this, arguments, void 0, function* ({ w, h, q, dir }) {
             var _b;
-            const outDir = path_1.default.resolve(__dirname, "..", "public", dir);
             const fileName = `${Date.now()}.jpg`;
+            const outDir = process.env.IS_SERVERLESS
+                ? path_1.default.resolve("/tmp", dir)
+                : path_1.default.resolve(__dirname, "..", "public", dir);
             const resultDir = path_1.default.join(outDir, fileName);
             if (!(0, fs_1.existsSync)(outDir)) {
                 (0, fs_1.mkdirSync)(outDir, { recursive: true });
