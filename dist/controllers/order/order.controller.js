@@ -78,7 +78,7 @@ class OrderController {
             const user = req.user;
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
             const orders = yield order_model_1.Order.find({ customer: user._id })
-                .skip(page - 1 * limit)
+                .skip((page - 1) * limit)
                 .limit(limit);
             return res.json((0, responseHelpers_1.createResponse)(200, orders, "Successfully fetched orders"));
         });

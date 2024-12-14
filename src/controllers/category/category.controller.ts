@@ -10,7 +10,7 @@ class Category {
   async get(req: Request, res: Response) {
     const { page, limit } = paginationSchema.parse(req.query);
     const categories = await CategoryModel.find()
-      .skip(page - 1 * limit)
+      .skip((page - 1) * limit)
       .limit(limit);
 
     res.json(

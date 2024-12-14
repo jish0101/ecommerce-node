@@ -12,7 +12,7 @@ class AddressController {
     const { page, limit } = paginationSchema.parse(req.query);
 
     const data = await Address.find()
-      .skip(page - 1 * limit)
+      .skip((page - 1) * limit)
       .limit(limit);
 
     res.json(createResponse(200, data, "Successfully fetched addresses"));

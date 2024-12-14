@@ -23,7 +23,7 @@ class AddressController {
         return __awaiter(this, void 0, void 0, function* () {
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
             const data = yield address_model_1.Address.find()
-                .skip(page - 1 * limit)
+                .skip((page - 1) * limit)
                 .limit(limit);
             res.json((0, responseHelpers_1.createResponse)(200, data, "Successfully fetched addresses"));
         });

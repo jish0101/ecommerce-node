@@ -86,7 +86,7 @@ class PaymentsController {
         return __awaiter(this, void 0, void 0, function* () {
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
             const payments = yield payment_model_1.Payments.find()
-                .skip(page - 1 * limit)
+                .skip((page - 1) * limit)
                 .limit(limit);
             res.json((0, responseHelpers_1.createResponse)(200, payments, "Successfully fetched payments"));
         });

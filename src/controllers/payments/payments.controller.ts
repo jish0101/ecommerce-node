@@ -104,7 +104,7 @@ class PaymentsController {
     const { page, limit } = paginationSchema.parse(req.query);
 
     const payments = await Payments.find()
-      .skip(page - 1 * limit)
+      .skip((page - 1) * limit)
       .limit(limit);
 
     res.json(createResponse(200, payments, "Successfully fetched payments"));
