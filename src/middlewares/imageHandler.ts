@@ -16,11 +16,11 @@ export const imgHandler = (dir: string, bodyKey: string) =>
         w: 500,
         h: 500,
         q: 80,
-        dir,
+        folder: dir,
       });
     });
 
-    const result = await Promise.all(imgLinks);
+    const result = (await Promise.all(imgLinks)).filter(r => r !== undefined);
 
     req.body[bodyKey] = result;
     next();

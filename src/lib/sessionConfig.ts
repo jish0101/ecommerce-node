@@ -1,5 +1,5 @@
-import { SessionOptions } from "express-session";
 import { KEYS } from "./keys";
+import { SessionOptions } from "express-session";
 
 const sessionOptions: SessionOptions = {
   secret: KEYS.REFRESH_SECRET,

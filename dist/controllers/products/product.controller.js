@@ -37,7 +37,7 @@ class ProductController {
             if (existing) {
                 const img = new ImageService_1.default();
                 result.imageLinks.forEach((link) => {
-                    return img.deleteImageByLink(link);
+                    return img.deleteImageByLink(link, "products");
                 });
                 throw new customError_1.CustomError("Product already exists", 400);
             }
@@ -60,18 +60,19 @@ class ProductController {
             const result = productSchema_1.createProductSchema.merge(idSchema_1.default).parse(req.body);
             const product = yield product_model_1.Product.findById(result._id);
             if (!product) {
+                const img = new ImageService_1.default();
                 if (result.imageLinks && result.imageLinks.length > 0) {
-                    const img = new ImageService_1.default();
-                    result.imageLinks.forEach((link) => {
-                        return img.deleteImageByLink(link);
+                    const results = result.imageLinks.map((link) => {
+                        return img.deleteImageByLink(link, "products");
                     });
+                    yield Promise.all(results);
                 }
                 throw new customError_1.CustomError("Product not found", 404);
             }
-            if (result.imageLinks && result.imageLinks.length > 0) {
+            if (product.imageLinks && product.imageLinks.length > 0) {
                 const img = new ImageService_1.default();
                 product.imageLinks.forEach((link) => {
-                    return img.deleteImageByLink(link);
+                    return img.deleteImageByLink(link, "products");
                 });
             }
             const updatedProduct = yield product_model_1.Product.findByIdAndUpdate(result._id, {
@@ -96,7 +97,7 @@ class ProductController {
                 throw new customError_1.CustomError("Product not found", 404);
             }
             const img = new ImageService_1.default();
-            product.imageLinks.forEach((link) => img.deleteImageByLink(link));
+            product.imageLinks.forEach((link) => img.deleteImageByLink(link, "products"));
             const deletedProduct = yield product_model_1.Product.findByIdAndDelete(result._id);
             return res.json((0, responseHelpers_1.createResponse)(200, deletedProduct, "Successfully deleted product"));
         });

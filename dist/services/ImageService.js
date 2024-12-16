@@ -8,52 +8,65 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = __importDefault(require("path"));
-const sharp_1 = __importDefault(require("sharp"));
-const fs_1 = require("fs");
+const keys_1 = require("../lib/keys");
+const cloudinary_1 = require("cloudinary");
 const customError_1 = require("../lib/customError");
+cloudinary_1.v2.config({
+    cloud_name: keys_1.KEYS.CLOUDINARY_NAME,
+    api_key: keys_1.KEYS.CLOUDINARY_API_KEY,
+    api_secret: keys_1.KEYS.CLOUDINARY_API_SECRET,
+});
 class OptimisedImage {
     constructor(file) {
         this.file = file;
     }
     getProfileImg(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ w, h, q, dir }) {
-            var _b;
-            const fileName = `${Date.now()}.jpg`;
-            const outDir = process.env.IS_SERVERLESS
-                ? path_1.default.resolve("/tmp", dir)
-                : path_1.default.resolve(__dirname, "..", "public", dir);
-            const resultDir = path_1.default.join(outDir, fileName);
-            if (!(0, fs_1.existsSync)(outDir)) {
-                (0, fs_1.mkdirSync)(outDir, { recursive: true });
-            }
+        return __awaiter(this, arguments, void 0, function* ({ w, h, q, folder }) {
             try {
-                yield (0, sharp_1.default)((_b = this.file) === null || _b === void 0 ? void 0 : _b.buffer)
-                    .resize({ width: w, height: h })
-                    .jpeg({ quality: q })
-                    .toFile(resultDir);
-                return `/${dir}/${fileName}`;
+                if (!this.file || !this.file.buffer) {
+                    throw new customError_1.CustomError('No file provided', 400);
+                }
+                const uploadResult = yield new Promise((resolve, reject) => {
+                    var _a;
+                    const uploadStream = cloudinary_1.v2.uploader.upload_stream({
+                        folder,
+                        transformation: [{ width: w, height: h, quality: q, crop: 'fill' }],
+                    }, (error, result) => {
+                        if (error)
+                            return reject(error);
+                        resolve(result);
+                    });
+                    if ((_a = this.file) === null || _a === void 0 ? void 0 : _a.buffer) {
+                        uploadStream.end(this.file.buffer);
+                    }
+                });
+                if (!uploadResult.secure_url) {
+                    throw new customError_1.CustomError('Failed to process image', 500);
+                }
+                return uploadResult.secure_url;
             }
-            catch (err) {
-                throw new customError_1.CustomError("Cannot process image", 500);
+            catch (error) {
+                console.error('Error processing image:', error);
             }
         });
     }
-    deleteImageByLink(imgPath) {
-        const normalizedPath = imgPath.startsWith("/") ? imgPath.slice(1) : imgPath;
-        const absolutePath = path_1.default.resolve(__dirname, "..", "public", normalizedPath);
-        try {
-            if ((0, fs_1.existsSync)(absolutePath)) {
-                (0, fs_1.unlinkSync)(absolutePath);
+    deleteImageByLink(secureUrl, folder) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const urlParts = secureUrl.split('/');
+                const fileNameWithExtension = urlParts.pop();
+                const fileName = fileNameWithExtension === null || fileNameWithExtension === void 0 ? void 0 : fileNameWithExtension.replace(/\.[^/.]+$/, '');
+                const publicId = `${folder}/${fileName}`;
+                const result = yield cloudinary_1.v2.uploader.destroy(publicId);
+                if (result.result !== 'ok') {
+                    throw new customError_1.CustomError('Failed to delete image', 500);
+                }
             }
-        }
-        catch (error) {
-            throw new customError_1.CustomError("Failed to delete image", 500);
-        }
+            catch (error) {
+                console.error('Error deleting image:', error);
+            }
+        });
     }
 }
 exports.default = OptimisedImage;

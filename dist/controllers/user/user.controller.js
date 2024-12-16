@@ -123,14 +123,17 @@ class UserController {
             }
             const opm = new ImageService_1.default(req.file);
             if (foundUser.profileImage) {
-                opm.deleteImageByLink(foundUser.profileImage);
+                opm.deleteImageByLink(foundUser.profileImage, foundUser.email);
             }
             const image = yield opm.getProfileImg({
                 w: 400,
                 h: 400,
                 q: 80,
-                dir: foundUser.email,
+                folder: foundUser.email,
             });
+            if (!image) {
+                throw new customError_1.CustomError("Failed to upload profile", 500);
+            }
             foundUser.profileImage = image;
             yield foundUser.save();
             res.json((0, responseHelpers_1.createResponse)(200, image, "Successfully uploaded profile"));

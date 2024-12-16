@@ -151,15 +151,19 @@ class UserController {
     const opm = new OptimisedImage(req.file);
 
     if (foundUser.profileImage) {
-      opm.deleteImageByLink(foundUser.profileImage);
+      opm.deleteImageByLink(foundUser.profileImage, foundUser.email);
     }
 
     const image = await opm.getProfileImg({
       w: 400,
       h: 400,
       q: 80,
-      dir: foundUser.email,
+      folder: foundUser.email,
     });
+
+    if (!image) {
+      throw new CustomError("Failed to upload profile", 500)
+    }
 
     foundUser.profileImage = image;
 

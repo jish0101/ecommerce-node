@@ -30,7 +30,7 @@ class ProductController {
       const img = new OptimisedImage();
 
       result.imageLinks.forEach((link) => {
-        return img.deleteImageByLink(link);
+        return img.deleteImageByLink(link, "products");
       });
 
       throw new CustomError("Product already exists", 400);
@@ -58,20 +58,21 @@ class ProductController {
     const product = await Product.findById(result._id);
 
     if (!product) {
-      if (result.imageLinks && result.imageLinks.length > 0) {
-        const img = new OptimisedImage();
-        result.imageLinks.forEach((link) => {
-          return img.deleteImageByLink(link);
-        });
-      }
+      const img = new OptimisedImage();
 
+      if (result.imageLinks && result.imageLinks.length > 0) {
+        const results = result.imageLinks.map((link) => {
+          return img.deleteImageByLink(link, "products");
+        });
+        await Promise.all(results)
+      }
       throw new CustomError("Product not found", 404);
     }
 
-    if (result.imageLinks && result.imageLinks.length > 0) {
+    if (product.imageLinks && product.imageLinks.length > 0) {
       const img = new OptimisedImage();
       product.imageLinks.forEach((link) => {
-        return img.deleteImageByLink(link);
+        return img.deleteImageByLink(link, "products");
       });
     }
 
@@ -105,7 +106,7 @@ class ProductController {
     }
 
     const img = new OptimisedImage();
-    product.imageLinks.forEach((link) => img.deleteImageByLink(link));
+    product.imageLinks.forEach((link) => img.deleteImageByLink(link, "products"));
 
     const deletedProduct = await Product.findByIdAndDelete(result._id);
 
