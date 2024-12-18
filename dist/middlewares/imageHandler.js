@@ -29,7 +29,7 @@ const imgHandler = (dir, bodyKey) => (0, helpers_1.asyncWrapper)((req, res, next
             folder: dir,
         });
     });
-    const result = (yield Promise.all(imgLinks)).filter(r => r !== undefined);
+    const result = (yield Promise.all(imgLinks)).filter((r) => r !== undefined);
     req.body[bodyKey] = result;
     next();
 }));

@@ -8,8 +8,16 @@ const zod_1 = __importDefault(require("zod"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const regex_1 = require("../../lib/regex");
 exports.createUserSchema = zod_1.default.object({
-    firstName: zod_1.default.string().trim().min(1, "First name is required").max(100, "First name cannot be more than 100 characters"),
-    lastName: zod_1.default.string().trim().min(1, "First name is required").max(100, "First name cannot be more than 100 characters"),
+    firstName: zod_1.default
+        .string()
+        .trim()
+        .min(1, "First name is required")
+        .max(100, "First name cannot be more than 100 characters"),
+    lastName: zod_1.default
+        .string()
+        .trim()
+        .min(1, "First name is required")
+        .max(100, "First name cannot be more than 100 characters"),
     email: zod_1.default.string().email("email format is not valid"),
     password: zod_1.default
         .string()
