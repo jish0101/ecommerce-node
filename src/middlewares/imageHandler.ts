@@ -20,7 +20,7 @@ export const imgHandler = (dir: string, bodyKey: string) =>
       });
     });
 
-    const result = (await Promise.all(imgLinks)).filter(r => r !== undefined);
+    const result = (await Promise.all(imgLinks)).filter((r) => r !== undefined);
 
     req.body[bodyKey] = result;
     next();

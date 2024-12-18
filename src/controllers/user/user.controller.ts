@@ -63,7 +63,7 @@ class UserController {
     });
 
     if (!emailSent) {
-      throw new CustomError("Failed to send otp", 500)
+      throw new CustomError("Failed to send otp", 500);
     }
 
     res.json(
@@ -162,7 +162,7 @@ class UserController {
     });
 
     if (!image) {
-      throw new CustomError("Failed to upload profile", 500)
+      throw new CustomError("Failed to upload profile", 500);
     }
 
     foundUser.profileImage = image;

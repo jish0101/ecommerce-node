@@ -1,10 +1,13 @@
 import path from "path";
 import dotenv from "dotenv";
 
-
-dotenv.config(process.env.NODE_ENV === "production" ? undefined: {
-  path: path.resolve(__dirname, "..", "..", ".env"),
-});
+dotenv.config(
+  process.env.NODE_ENV === "production"
+    ? undefined
+    : {
+        path: path.resolve(__dirname, "..", "..", ".env"),
+      },
+);
 
 export const KEYS: Record<string, string> = {
   PORT: process.env.PORT!,

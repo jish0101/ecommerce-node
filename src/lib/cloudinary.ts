@@ -1,5 +1,5 @@
-import { KEYS } from './keys';
-import { v2 as cloudinary } from 'cloudinary';
+import { KEYS } from "./keys";
+import { v2 as cloudinary } from "cloudinary";
 
 const { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = KEYS;
 

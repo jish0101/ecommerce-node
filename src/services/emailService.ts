@@ -23,7 +23,9 @@ const templateDir: Record<OtpAction, string[]> = {
 };
 
 class Mailer {
-  async sendConfirmationOtp(config: SendConfirmationOtpConfig): Promise<boolean> {
+  async sendConfirmationOtp(
+    config: SendConfirmationOtpConfig,
+  ): Promise<boolean> {
     const transporter = createTransporter();
     const { email, otpVal, userName, type } = config;
 
@@ -33,11 +35,13 @@ class Mailer {
         { userName, otpVal },
         (err, renderedHtml) => {
           if (err) {
-            reject(new CustomError(`Template rendering error: ${err.message}`, 500));
+            reject(
+              new CustomError(`Template rendering error: ${err.message}`, 500),
+            );
           } else {
             resolve(renderedHtml);
           }
-        }
+        },
       );
     });
 

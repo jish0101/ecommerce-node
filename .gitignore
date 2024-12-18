@@ -4,3 +4,4 @@ node_modules
 coverage
 /src/public
 /docker-compose.yml
+/src/seed.ts

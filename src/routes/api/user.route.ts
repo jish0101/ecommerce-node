@@ -8,7 +8,12 @@ import { authenticateJwt } from "@/middlewares/passport";
 const router = express.Router();
 const userController = new UserController();
 
-router.get("/get", authenticateJwt(), checkRoles(["ADMIN"]), asyncWrapper(userController.get));
+router.get(
+  "/get",
+  authenticateJwt(),
+  checkRoles(["ADMIN"]),
+  asyncWrapper(userController.get),
+);
 router.post("/create", asyncWrapper(userController.create));
 router.put("/update", authenticateJwt(), asyncWrapper(userController.update));
 router.put(

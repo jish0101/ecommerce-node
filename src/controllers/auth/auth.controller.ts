@@ -18,7 +18,7 @@ class AuthController {
     const result = authSchema.parse(req.body);
 
     const user = await User.findOne({ email: result.email });
-    
+
     if (!user) {
       throw new CustomError("Credentials are not valid", 400);
     }
@@ -40,9 +40,9 @@ class AuthController {
 
     const accessToken = tokens.getToken(payloadUser, "access");
     const refreshToken = tokens.getToken(payloadUser, "refresh");
-    
+
     user.refreshToken = refreshToken;
-    
+
     await user.save();
 
     payloadUser.accessToken = accessToken;
@@ -160,7 +160,11 @@ class AuthController {
     const updatedUser = await User.findByIdAndUpdate(userId, { password });
 
     if (!updatedUser) {
-      throw new CustomError("Server Error: failed to reset password", 500, false);
+      throw new CustomError(
+        "Server Error: failed to reset password",
+        500,
+        false,
+      );
     }
 
     return res.json(
@@ -173,7 +177,7 @@ class AuthController {
 
     const otpService = new OtpService();
 
-    const user = await User.findOne({ $or: [{_id: userId}, {email}] });
+    const user = await User.findOne({ $or: [{ _id: userId }, { email }] });
 
     if (!user) {
       throw new CustomError("User not found", 404, false);
@@ -198,14 +202,9 @@ class AuthController {
     });
 
     return res.json(
-      createResponse(
-        200,
-        true,
-        `Successfully sent an otp to ${user.email}`,
-        {
-          otp: removeFields(createdOtp, ["value", "expiresAt", "isUsed"]),
-        }
-      ),
+      createResponse(200, true, `Successfully sent an otp to ${user.email}`, {
+        otp: removeFields(createdOtp, ["value", "expiresAt", "isUsed"]),
+      }),
     );
   }
 }

@@ -64,7 +64,7 @@ class ProductController {
         const results = result.imageLinks.map((link) => {
           return img.deleteImageByLink(link, "products");
         });
-        await Promise.all(results)
+        await Promise.all(results);
       }
       throw new CustomError("Product not found", 404);
     }
@@ -106,7 +106,9 @@ class ProductController {
     }
 
     const img = new OptimisedImage();
-    product.imageLinks.forEach((link) => img.deleteImageByLink(link, "products"));
+    product.imageLinks.forEach((link) =>
+      img.deleteImageByLink(link, "products"),
+    );
 
     const deletedProduct = await Product.findByIdAndDelete(result._id);
 
