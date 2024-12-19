@@ -12,7 +12,7 @@ class SubCategory {
     const isPaginationDisabled = req.query.isPaginationDisabled === "true";
 
     if (isPaginationDisabled) {
-      const categories = await SubCategoryModel.find();
+      const categories = await SubCategoryModel.find().populate("category");
       return res.json(
         createResponse(200, categories, "Successfully fetched sub-categories"),
       );

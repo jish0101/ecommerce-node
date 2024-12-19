@@ -24,7 +24,7 @@ class SubCategory {
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
             const isPaginationDisabled = req.query.isPaginationDisabled === "true";
             if (isPaginationDisabled) {
-                const categories = yield sub_category_model_1.SubCategory.find();
+                const categories = yield sub_category_model_1.SubCategory.find().populate("category");
                 return res.json((0, responseHelpers_1.createResponse)(200, categories, "Successfully fetched sub-categories"));
             }
             const categories = yield sub_category_model_1.SubCategory.find()
