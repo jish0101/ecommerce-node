@@ -9,6 +9,15 @@ import { SubCategory as SubCategoryModel } from "../../models/sub-category/sub-c
 class SubCategory {
   async get(req: Request, res: Response) {
     const { page, limit } = paginationSchema.parse(req.query);
+    const isPaginationDisabled = req.query.isPaginationDisabled === "true";
+
+    if (isPaginationDisabled) {
+      const categories = await SubCategoryModel.find();
+      return res.json(
+        createResponse(200, categories, "Successfully fetched sub-categories"),
+      );
+    }
+
     const categories = await SubCategoryModel.find()
       .skip((page - 1) * limit)
       .limit(limit);
