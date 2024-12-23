@@ -22,9 +22,17 @@ const productSchema = new mongoose_1.default.Schema({
         ref: "Category",
         required: true,
     },
+    categoryName: {
+        type: String,
+        required: true,
+    },
     subCategory: {
         type: mongoose_1.default.Schema.ObjectId,
         ref: "SubCategory",
+        required: true,
+    },
+    subCategoryName: {
+        type: String,
         required: true,
     },
     price: {
@@ -50,5 +58,6 @@ const productSchema = new mongoose_1.default.Schema({
         required: true,
     },
 }, { timestamps: true });
+productSchema.index({ name: "text", "category.name": "text", "subCategory.name": "text" });
 exports.Product = mongoose_1.default.model("Product", productSchema);
 //# sourceMappingURL=product.model.js.map

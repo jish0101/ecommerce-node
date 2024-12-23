@@ -48,10 +48,9 @@ class AuthController {
     payloadUser.accessToken = accessToken;
 
     res.cookie("refresh_token", refreshToken, {
-      path: "/",
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
     });
     res.json(createResponse(200, payloadUser, "Successfully logged-in user"));
   }
@@ -79,7 +78,7 @@ class AuthController {
     const cookies = req.cookies;
 
     if (!cookies || !cookies.refresh_token) {
-      throw new CustomError("Credentials are not valid", 400);
+      throw new CustomError("Credentials are not valid", 401);
     }
 
     const tokens = new TokenService();

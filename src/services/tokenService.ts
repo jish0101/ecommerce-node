@@ -8,7 +8,7 @@ type TokenType = "access" | "refresh";
 class TokenService {
   getToken(payload: Payload, t: TokenType) {
     if (t === "access") {
-      return jwt.sign(payload, KEYS.JWT_SECRET, { expiresIn: "1d" });
+      return jwt.sign(payload, KEYS.JWT_SECRET, { expiresIn: "1h" });
     }
     if (t === "refresh") {
       return jwt.sign(payload, KEYS.REFRESH_SECRET, { expiresIn: "1d" });

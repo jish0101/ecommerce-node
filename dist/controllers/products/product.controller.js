@@ -12,18 +12,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const responseHelpers_1 = require("../../lib/responseHelpers");
-const productSchema_1 = require("./productSchema");
-const product_model_1 = require("../../models/product/product.model");
+const zod_1 = require("zod");
 const idSchema_1 = __importDefault(require("../idSchema"));
 const customError_1 = require("../../lib/customError");
 const ImageService_1 = __importDefault(require("../../services/ImageService"));
+const productSchema_1 = require("./productSchema");
 const paginationSchema_1 = require("../paginationSchema");
+const product_model_1 = require("../../models/product/product.model");
+const responseHelpers_1 = require("../../lib/responseHelpers");
+const getSchemaWithoutPagination = zod_1.z.object({
+    search: zod_1.z.string().trim().optional().default(""),
+    categoryId: zod_1.z.string().optional(),
+    subCategoryId: zod_1.z.string().optional(),
+});
+const getSchema = getSchemaWithoutPagination.merge(paginationSchema_1.paginationSchema);
 class ProductController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
-            const products = yield product_model_1.Product.find()
+            const { page, limit, search, categoryId, subCategoryId } = getSchema.parse(req.query);
+            const query = {};
+            if (categoryId) {
+                query.category = categoryId;
+            }
+            if (subCategoryId) {
+                query.subCategoryId = categoryId;
+            }
+            if (search) {
+                query.$text = { $search: search };
+            }
+            const products = yield product_model_1.Product.find(query)
                 .skip((page - 1) * limit)
                 .limit(limit);
             return res.json((0, responseHelpers_1.createResponse)(200, products, "Successfully fetched products"));

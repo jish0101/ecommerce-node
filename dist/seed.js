@@ -74,12 +74,14 @@ const seed = () => __awaiter(void 0, void 0, void 0, function* () {
                 price: faker_1.faker.commerce.price({ min: 100, max: 1000 }),
                 stock: faker_1.faker.number.int({ min: 10, max: 100 }),
                 imageLinks: [
-                    faker_1.faker.image.url({ width: 100, height: 100 }),
-                    faker_1.faker.image.url({ width: 100, height: 100 }),
-                    faker_1.faker.image.url({ width: 100, height: 100 }),
+                    faker_1.faker.image.url({ width: 300, height: 300 }),
+                    faker_1.faker.image.url({ width: 300, height: 300 }),
+                    faker_1.faker.image.url({ width: 300, height: 300 }),
                 ],
                 category: category._id,
+                categoryName: category.name,
                 subCategory: subCategoryDoc._id,
+                subCategoryName: subCategoryDoc.name,
                 createdBy: adminUser._id,
                 updatedBy: adminUser._id,
             }));

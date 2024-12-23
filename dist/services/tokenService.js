@@ -8,7 +8,7 @@ const keys_1 = require("../lib/keys");
 class TokenService {
     getToken(payload, t) {
         if (t === "access") {
-            return jsonwebtoken_1.default.sign(payload, keys_1.KEYS.JWT_SECRET, { expiresIn: "1d" });
+            return jsonwebtoken_1.default.sign(payload, keys_1.KEYS.JWT_SECRET, { expiresIn: "1h" });
         }
         if (t === "refresh") {
             return jsonwebtoken_1.default.sign(payload, keys_1.KEYS.REFRESH_SECRET, { expiresIn: "1d" });

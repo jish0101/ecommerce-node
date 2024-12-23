@@ -1,18 +1,42 @@
-import { Request, Response } from "express";
-import { createResponse } from "../../lib/responseHelpers";
-import { createProductSchema } from "./productSchema";
-import { Product } from "@/models/product/product.model";
-import { PayloadUserWithID } from "@/models/user/user.model";
+import { z } from "zod";
 import idSchema from "../idSchema";
+import { Request, Response } from "express";
 import { CustomError } from "@/lib/customError";
 import OptimisedImage from "@/services/ImageService";
+import { createProductSchema } from "./productSchema";
 import { paginationSchema } from "../paginationSchema";
+import { Product } from "@/models/product/product.model";
+import { createResponse } from "../../lib/responseHelpers";
+import { PayloadUserWithID } from "@/models/user/user.model";
+
+const getSchemaWithoutPagination = z.object({
+  search: z.string().trim().optional().default(""),
+  categoryId: z.string().optional(),
+  subCategoryId: z.string().optional(),
+});
+const getSchema = getSchemaWithoutPagination.merge(paginationSchema);
 
 class ProductController {
   async get(req: Request, res: Response) {
-    const { page, limit } = paginationSchema.parse(req.query);
+    const { page, limit, search, categoryId, subCategoryId } = getSchema.parse(
+      req.query,
+    );
 
-    const products = await Product.find()
+    const query: Record<any, any> = {};
+
+    if (categoryId) {
+      query.category = categoryId;
+    }
+
+    if (subCategoryId) {
+      query.subCategoryId = categoryId;
+    }
+
+    if (search) {
+      query.$text = { $search: search }
+    }
+
+    const products = await Product.find(query)
       .skip((page - 1) * limit)
       .limit(limit);
 

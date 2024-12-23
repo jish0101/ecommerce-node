@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema(
-  {
+const productSchema = new mongoose.Schema({
     name: {
       type: String,
       required: true,
@@ -18,9 +17,17 @@ const productSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
+    categoryName: {
+      type: String,
+      required: true,
+    },
     subCategory: {
       type: mongoose.Schema.ObjectId,
       ref: "SubCategory",
+      required: true,
+    },
+    subCategoryName: {
+      type: String,
       required: true,
     },
     price: {
@@ -48,5 +55,7 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+productSchema.index({name: "text", "category.name": "text", "subCategory.name": "text"})
 
 export const Product = mongoose.model("Product", productSchema);
