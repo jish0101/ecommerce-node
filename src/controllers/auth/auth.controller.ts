@@ -12,6 +12,7 @@ import OtpService from "@/services/otpService";
 import TokenService from "@/services/tokenService";
 import { createResponse } from "@/lib/responseHelpers";
 import { PayloadUserWithID, User } from "@/models/user/user.model";
+import { KEYS } from "@/lib/keys";
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -50,7 +51,7 @@ class AuthController {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      secure: KEYS.NODE_ENV === "production",
     });
     res.json(createResponse(200, payloadUser, "Successfully logged-in user"));
   }
