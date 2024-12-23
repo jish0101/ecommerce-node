@@ -4,6 +4,7 @@ import {
   sendOtpSchema,
   verifyUserSchema,
 } from "./validationSchema";
+import { KEYS } from "@/lib/keys";
 import { Otp } from "@/models/otp/Otp";
 import Mailer from "@/services/emailService";
 import { removeFields } from "@/lib/helpers";
@@ -12,7 +13,6 @@ import OtpService from "@/services/otpService";
 import TokenService from "@/services/tokenService";
 import { createResponse } from "@/lib/responseHelpers";
 import { PayloadUserWithID, User } from "@/models/user/user.model";
-import { KEYS } from "@/lib/keys";
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -50,7 +50,7 @@ class AuthController {
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: KEYS.NODE_ENV === "production" ? "none": "lax",
       secure: KEYS.NODE_ENV === "production",
     });
     res.json(createResponse(200, payloadUser, "Successfully logged-in user"));
@@ -66,10 +66,9 @@ class AuthController {
     }
 
     res.clearCookie("refresh_token", {
-      path: "/",
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: KEYS.NODE_ENV === "production" ? "none": "lax",
+      secure: KEYS.NODE_ENV === "production",
     });
 
     res.json(createResponse(200, null, "Successfully logged-out user"));
@@ -79,7 +78,7 @@ class AuthController {
     const cookies = req.cookies;
 
     if (!cookies || !cookies.refresh_token) {
-      throw new CustomError("Credentials are not valid", 401);
+      throw new CustomError("Credentials are not valid", 400);
     }
 
     const tokens = new TokenService();

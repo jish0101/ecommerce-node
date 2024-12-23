@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const validationSchema_1 = require("./validationSchema");
+const keys_1 = require("../../lib/keys");
 const Otp_1 = require("../../models/otp/Otp");
 const emailService_1 = __importDefault(require("../../services/emailService"));
 const helpers_1 = require("../../lib/helpers");
@@ -47,8 +48,8 @@ class AuthController {
             payloadUser.accessToken = accessToken;
             res.cookie("refresh_token", refreshToken, {
                 httpOnly: true,
-                sameSite: "none",
-                secure: process.env.NODE_ENV === "production",
+                sameSite: keys_1.KEYS.NODE_ENV === "production" ? "none" : "lax",
+                secure: keys_1.KEYS.NODE_ENV === "production",
             });
             res.json((0, responseHelpers_1.createResponse)(200, payloadUser, "Successfully logged-in user"));
         });
@@ -60,10 +61,9 @@ class AuthController {
                 return res.json((0, responseHelpers_1.createResponse)(200, null, "Successfully logged-out user"));
             }
             res.clearCookie("refresh_token", {
-                path: "/",
                 httpOnly: true,
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24,
+                sameSite: keys_1.KEYS.NODE_ENV === "production" ? "none" : "lax",
+                secure: keys_1.KEYS.NODE_ENV === "production",
             });
             res.json((0, responseHelpers_1.createResponse)(200, null, "Successfully logged-out user"));
         });
@@ -72,7 +72,7 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             const cookies = req.cookies;
             if (!cookies || !cookies.refresh_token) {
-                throw new customError_1.CustomError("Credentials are not valid", 401);
+                throw new customError_1.CustomError("Credentials are not valid", 400);
             }
             const tokens = new tokenService_1.default();
             const isOk = tokens.verifyToken(cookies.refresh_token);
