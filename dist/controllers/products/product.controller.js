@@ -21,6 +21,7 @@ const paginationSchema_1 = require("../paginationSchema");
 const product_model_1 = require("../../models/product/product.model");
 const responseHelpers_1 = require("../../lib/responseHelpers");
 const getSchemaWithoutPagination = zod_1.z.object({
+    id: zod_1.z.string().trim().optional().default(""),
     search: zod_1.z.string().trim().optional().default(""),
     categoryId: zod_1.z.string().optional(),
     subCategoryId: zod_1.z.string().optional(),
@@ -29,16 +30,19 @@ const getSchema = getSchemaWithoutPagination.merge(paginationSchema_1.pagination
 class ProductController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { page, limit, search, categoryId, subCategoryId } = getSchema.parse(req.query);
+            const { id, page, limit, search, categoryId, subCategoryId } = getSchema.parse(req.query);
             const query = {};
             if (categoryId) {
                 query.category = categoryId;
             }
             if (subCategoryId) {
-                query.subCategoryId = categoryId;
+                query.subCategoryId = subCategoryId;
             }
             if (search) {
                 query.$text = { $search: search };
+            }
+            if (id) {
+                query._id = id;
             }
             const products = yield product_model_1.Product.find(query)
                 .skip((page - 1) * limit)

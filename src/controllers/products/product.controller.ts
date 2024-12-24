@@ -10,6 +10,7 @@ import { createResponse } from "../../lib/responseHelpers";
 import { PayloadUserWithID } from "@/models/user/user.model";
 
 const getSchemaWithoutPagination = z.object({
+  id: z.string().trim().optional().default(""),
   search: z.string().trim().optional().default(""),
   categoryId: z.string().optional(),
   subCategoryId: z.string().optional(),
@@ -18,10 +19,10 @@ const getSchema = getSchemaWithoutPagination.merge(paginationSchema);
 
 class ProductController {
   async get(req: Request, res: Response) {
-    const { page, limit, search, categoryId, subCategoryId } = getSchema.parse(
+    const { id, page, limit, search, categoryId, subCategoryId } = getSchema.parse(
       req.query,
     );
-
+    
     const query: Record<any, any> = {};
 
     if (categoryId) {
@@ -29,11 +30,15 @@ class ProductController {
     }
 
     if (subCategoryId) {
-      query.subCategoryId = categoryId;
+      query.subCategoryId = subCategoryId;
     }
 
     if (search) {
       query.$text = { $search: search }
+    }
+
+    if (id) {
+      query._id = id;
     }
 
     const products = await Product.find(query)
