@@ -19,7 +19,7 @@ const idSchema_1 = __importDefault(require("../idSchema"));
 const cartSchema = zod_1.z.object({
     items: zod_1.z.array(zod_1.z.object({
         productId: zod_1.z.string(),
-        quantity: zod_1.z.number().min(1),
+        quantity: zod_1.z.number().min(0),
     })),
 });
 class CartController {
@@ -27,12 +27,33 @@ class CartController {
         return __awaiter(this, void 0, void 0, function* () {
             const user = req.user;
             const { items } = cartSchema.parse(req.body);
-            const cart = yield cart_model_1.default.findOne({ userId: user._id });
-            if (cart) {
-                const cart = yield cart_model_1.default.updateOne({ userId: user._id }, { items }, { new: true });
+            const foundCart = yield cart_model_1.default.findOne({ userId: user._id });
+            if (foundCart) {
+                const newItems = [];
+                // Process existing cart items
+                foundCart.items.forEach(item => {
+                    const foundItem = items.find(i => i.productId === item.productId.toString());
+                    if (foundItem && foundItem.quantity > 0) {
+                        // Update quantity for existing item
+                        newItems.push({ productId: item.productId.toString(), quantity: foundItem.quantity });
+                    }
+                    else if (!foundItem) {
+                        // Keep the item in the cart if not in the input but exists in the cart
+                        newItems.push({ productId: item.productId.toString(), quantity: item.quantity });
+                    }
+                });
+                // Add new items from `items` array that are not in `foundCart.items`
+                items.forEach(newItem => {
+                    const existsInCart = foundCart.items.some(cartItem => cartItem.productId.toString() === newItem.productId);
+                    if (!existsInCart && newItem.quantity > 0) {
+                        newItems.push(newItem);
+                    }
+                });
+                const cart = yield cart_model_1.default.updateOne({ userId: user._id }, { items: newItems }, { new: true });
                 res.json((0, responseHelpers_1.createResponse)(200, cart, "Successfully updated item in cart"));
             }
             else {
+                // Create a new cart if none exists
                 const cart = yield cart_model_1.default.create({ userId: user._id, items });
                 res.json((0, responseHelpers_1.createResponse)(200, cart, "Successfully updated item in cart"));
             }
