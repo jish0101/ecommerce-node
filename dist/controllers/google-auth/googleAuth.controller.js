@@ -23,7 +23,7 @@ class GoogleAuthController {
     handleSuccess(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!req.user) {
-                return res.redirect(`${keys_1.KEYS.CLIENT_BASE_URL}/auth/failed?code=500&method=2`);
+                return res.redirect(`${keys_1.KEYS.CLIENT_BASE_URL}/auth/login?auth=failed`);
             }
             const tokens = new tokenService_1.default();
             const user = req.user;
@@ -35,7 +35,7 @@ class GoogleAuthController {
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 60 * 24,
             });
-            res.redirect(`${keys_1.KEYS.CLIENT_BASE_URL}/auth/success`);
+            res.redirect(`${keys_1.KEYS.CLIENT_BASE_URL}/auth/login?auth=success`);
         });
     }
 }

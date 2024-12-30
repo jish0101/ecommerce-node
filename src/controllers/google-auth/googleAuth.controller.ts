@@ -11,7 +11,7 @@ class GoogleAuthController {
   async handleSuccess(req: Request, res: Response) {
     if (!req.user) {
       return res.redirect(
-        `${KEYS.CLIENT_BASE_URL}/auth/failed?code=500&method=2`,
+        `${KEYS.CLIENT_BASE_URL}/auth/login?auth=failed`,
       );
     }
 
@@ -28,7 +28,7 @@ class GoogleAuthController {
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    res.redirect(`${KEYS.CLIENT_BASE_URL}/auth/success`);
+    res.redirect(`${KEYS.CLIENT_BASE_URL}/auth/login?auth=success`);
   }
 }
 
