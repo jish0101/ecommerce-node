@@ -15,11 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const keys_1 = require("../../lib/keys");
 const tokenService_1 = __importDefault(require("../../services/tokenService"));
 class GoogleAuthController {
-    handleFailure(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            res.redirect(`${keys_1.KEYS.CLIENT_BASE_URL}/auth/failed?code=500&method=2`);
-        });
-    }
+    // async handleFailure(req: Request, res: Response) {
+    //   res.redirect(`${KEYS.CLIENT_BASE_URL}/auth/failed?code=500&method=2`);
+    // }
     handleSuccess(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!req.user) {
@@ -30,10 +28,9 @@ class GoogleAuthController {
             const refreshToken = tokens.getToken(user, "refresh");
             user.accessToken = tokens.getToken(user, "access");
             res.cookie("refresh_token", refreshToken, {
-                path: "/",
                 httpOnly: true,
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24,
+                sameSite: keys_1.KEYS.NODE_ENV === "production" ? "none" : "lax",
+                secure: keys_1.KEYS.NODE_ENV === "production",
             });
             res.redirect(`${keys_1.KEYS.CLIENT_BASE_URL}/auth/login?auth=success`);
         });

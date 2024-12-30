@@ -4,9 +4,9 @@ import TokenService from "@/services/tokenService";
 import { PayloadUserWithID } from "@/models/user/user.model";
 
 class GoogleAuthController {
-  async handleFailure(req: Request, res: Response) {
-    res.redirect(`${KEYS.CLIENT_BASE_URL}/auth/failed?code=500&method=2`);
-  }
+  // async handleFailure(req: Request, res: Response) {
+  //   res.redirect(`${KEYS.CLIENT_BASE_URL}/auth/failed?code=500&method=2`);
+  // }
 
   async handleSuccess(req: Request, res: Response) {
     if (!req.user) {
@@ -22,10 +22,9 @@ class GoogleAuthController {
     user.accessToken = tokens.getToken(user, "access");
 
     res.cookie("refresh_token", refreshToken, {
-      path: "/",
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: KEYS.NODE_ENV === "production" ? "none": "lax",
+      secure: KEYS.NODE_ENV === "production",
     });
 
     res.redirect(`${KEYS.CLIENT_BASE_URL}/auth/login?auth=success`);

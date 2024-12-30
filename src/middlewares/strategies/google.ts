@@ -13,6 +13,7 @@ const googleAuthStrategy = new GoogleAuthStrategy(
   async function (request, accessToken, refreshToken, profile, done) {
     try {
       const foundEmail = profile.emails?.find((mail) => mail.verified === true);
+
       let found = await User.findOne({
         email: foundEmail ? foundEmail.value : "",
       }).lean();
@@ -30,7 +31,7 @@ const googleAuthStrategy = new GoogleAuthStrategy(
         });
 
         if (!user) {
-          return done(new CustomError("Server error", 500), false);
+          return done(new CustomError("Failed to login with google", 500), false);
         }
 
         const payload: PayloadUserWithID = {
@@ -57,7 +58,7 @@ const googleAuthStrategy = new GoogleAuthStrategy(
       return done(null, payload);
     } catch (error) {
       console.log("error => ", error);
-      return done(null, false);
+      return done(new CustomError("Failed to login with google", 500), false);
     }
   },
 );

@@ -38,7 +38,7 @@ const googleAuthStrategy = new passport_google_oauth20_1.Strategy({
                     userType: "google",
                 });
                 if (!user) {
-                    return done(new customError_1.CustomError("Server error", 500), false);
+                    return done(new customError_1.CustomError("Failed to login with google", 500), false);
                 }
                 const payload = {
                     _id: String(user._id),
@@ -64,7 +64,7 @@ const googleAuthStrategy = new passport_google_oauth20_1.Strategy({
         }
         catch (error) {
             console.log("error => ", error);
-            return done(null, false);
+            return done(new customError_1.CustomError("Failed to login with google", 500), false);
         }
     });
 });

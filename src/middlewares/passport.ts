@@ -17,7 +17,7 @@ export const authenticateGoogle = () =>
 export const authGoogleCallback = () =>
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "/auth/failure",
+    failureRedirect: "/auth/login?auth=failed",
   });
 
 export default passport;
