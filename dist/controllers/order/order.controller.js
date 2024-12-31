@@ -77,10 +77,13 @@ class OrderController {
         return __awaiter(this, void 0, void 0, function* () {
             const user = req.user;
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
-            const orders = yield order_model_1.Order.find({ customer: user._id })
-                .skip((page - 1) * limit)
-                .limit(limit);
-            return res.json((0, responseHelpers_1.createResponse)(200, orders, "Successfully fetched orders"));
+            const [orders, total] = yield Promise.all([
+                order_model_1.Order.find({ customer: user._id })
+                    .skip((page - 1) * limit)
+                    .limit(limit),
+                order_model_1.Order.countDocuments()
+            ]);
+            return res.json((0, responseHelpers_1.createResponse)(200, orders, "Successfully fetched orders", { page, limit, total }));
         });
     }
     update(req, res) {

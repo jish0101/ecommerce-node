@@ -19,10 +19,9 @@ const getSchema = getSchemaWithoutPagination.merge(paginationSchema);
 
 class ProductController {
   async get(req: Request, res: Response) {
-    const { id, page, limit, search, categoryId, subCategoryId } = getSchema.parse(
-      req.query,
-    );
-    
+    const result = getSchema.parse(req.query);
+    const { id, page, limit, search, categoryId, subCategoryId } = result;
+
     const query: Record<any, any> = {};
 
     if (categoryId) {
@@ -34,19 +33,22 @@ class ProductController {
     }
 
     if (search) {
-      query.$text = { $search: search }
+      query.$text = { $search: search };
     }
 
     if (id) {
       query._id = id;
     }
 
-    const products = await Product.find(query)
+    const [products, total] = await Promise.all([
+      Product.find(query)
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit),
+      Product.countDocuments(query)
+    ]);
 
     return res.json(
-      createResponse(200, products, "Successfully fetched products"),
+      createResponse(200, products, "Successfully fetched products", {page, limit, total}),
     );
   }
   async create(req: Request, res: Response) {
@@ -58,9 +60,11 @@ class ProductController {
     if (existing) {
       const img = new OptimisedImage();
 
-      result.imageLinks.forEach((link) => {
+      const prm = result.imageLinks.map((link) => {
         return img.deleteImageByLink(link, "products");
       });
+
+      await Promise.all(prm);
 
       throw new CustomError("Product already exists", 400);
     }
@@ -90,10 +94,10 @@ class ProductController {
       const img = new OptimisedImage();
 
       if (result.imageLinks && result.imageLinks.length > 0) {
-        const results = result.imageLinks.map((link) => {
+        const prm = result.imageLinks.map((link) => {
           return img.deleteImageByLink(link, "products");
         });
-        await Promise.all(results);
+        await Promise.all(prm);
       }
       throw new CustomError("Product not found", 404);
     }

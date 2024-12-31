@@ -14,13 +14,16 @@ class UserController {
   async get(req: Request, res: Response) {
     const { page, limit } = paginationSchema.parse(req.query);
 
-    const users = await User.find()
+    const [users, total] = await Promise.all([
+      User.find()
       .skip((page - 1) * limit)
       .limit(limit)
       .select("-password -__v -refreshToken")
-      .lean();
+      .lean(),
+      User.countDocuments()
+    ])
 
-    res.json(createResponse(200, users, "Successfully fetched users"));
+    res.json(createResponse(200, users, "Successfully fetched users", {page, limit, total}));
   }
   async create(req: Request, res: Response) {
     const result = createUserSchema.parse(req.body);

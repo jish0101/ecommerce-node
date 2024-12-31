@@ -7,12 +7,14 @@ import { imgHandler } from "@/middlewares/imageHandler";
 import validator from "@/middlewares/zodValidator";
 import { createProductSchema } from "@/controllers/products/productSchema";
 import idSchema from "@/controllers/idSchema";
+import { authenticateJwt } from "@/middlewares/passport";
 
 const router = express.Router();
 const productController = new ProductController();
 
 router.post(
   "/create",
+  authenticateJwt(),
   checkRoles(["ADMIN"]),
   multerInstance.array("productImages", 4),
   validator(createProductSchema, "body"),
@@ -21,6 +23,7 @@ router.post(
 );
 router.put(
   "/update",
+  authenticateJwt(),
   checkRoles(["ADMIN"]),
   multerInstance.array("productImages", 4),
   validator(createProductSchema.merge(idSchema), "body"),
@@ -29,6 +32,7 @@ router.put(
 );
 router.delete(
   "/delete",
+  authenticateJwt(),
   checkRoles(["ADMIN"]),
   asyncWrapper(productController.delete),
 );

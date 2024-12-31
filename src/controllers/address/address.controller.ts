@@ -11,11 +11,14 @@ class AddressController {
   async get(req: Request, res: Response) {
     const { page, limit } = paginationSchema.parse(req.query);
 
-    const data = await Address.find()
+    const [data, total] = await Promise.all([
+      Address.find()
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit),
+      Address.countDocuments(),
+    ])
 
-    res.json(createResponse(200, data, "Successfully fetched addresses"));
+    res.json(createResponse(200, data, "Successfully fetched addresses", {page, limit, total}));
   }
   async create(req: Request, res: Response) {
     const payload = createAddressSchema.parse(req.body);

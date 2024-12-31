@@ -30,7 +30,8 @@ const getSchema = getSchemaWithoutPagination.merge(paginationSchema_1.pagination
 class ProductController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id, page, limit, search, categoryId, subCategoryId } = getSchema.parse(req.query);
+            const result = getSchema.parse(req.query);
+            const { id, page, limit, search, categoryId, subCategoryId } = result;
             const query = {};
             if (categoryId) {
                 query.category = categoryId;
@@ -44,10 +45,13 @@ class ProductController {
             if (id) {
                 query._id = id;
             }
-            const products = yield product_model_1.Product.find(query)
-                .skip((page - 1) * limit)
-                .limit(limit);
-            return res.json((0, responseHelpers_1.createResponse)(200, products, "Successfully fetched products"));
+            const [products, total] = yield Promise.all([
+                product_model_1.Product.find(query)
+                    .skip((page - 1) * limit)
+                    .limit(limit),
+                product_model_1.Product.countDocuments(query)
+            ]);
+            return res.json((0, responseHelpers_1.createResponse)(200, products, "Successfully fetched products", { page, limit, total }));
         });
     }
     create(req, res) {
@@ -57,9 +61,10 @@ class ProductController {
             const existing = yield product_model_1.Product.findOne({ name: result.name });
             if (existing) {
                 const img = new ImageService_1.default();
-                result.imageLinks.forEach((link) => {
+                const prm = result.imageLinks.map((link) => {
                     return img.deleteImageByLink(link, "products");
                 });
+                yield Promise.all(prm);
                 throw new customError_1.CustomError("Product already exists", 400);
             }
             const product = yield product_model_1.Product.create({
@@ -83,10 +88,10 @@ class ProductController {
             if (!product) {
                 const img = new ImageService_1.default();
                 if (result.imageLinks && result.imageLinks.length > 0) {
-                    const results = result.imageLinks.map((link) => {
+                    const prm = result.imageLinks.map((link) => {
                         return img.deleteImageByLink(link, "products");
                     });
-                    yield Promise.all(results);
+                    yield Promise.all(prm);
                 }
                 throw new customError_1.CustomError("Product not found", 404);
             }

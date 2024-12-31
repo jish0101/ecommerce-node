@@ -18,12 +18,15 @@ class SubCategory {
       );
     }
 
-    const categories = await SubCategoryModel.find()
+    const [categories, total] = await Promise.all([
+      SubCategoryModel.find()
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit),
+      SubCategoryModel.countDocuments()
+    ]);
 
     res.json(
-      createResponse(200, categories, "Successfully fetched sub-categories"),
+      createResponse(200, categories, "Successfully fetched sub-categories", {page, limit, total}),
     );
   }
   async create(req: Request, res: Response) {

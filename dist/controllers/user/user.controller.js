@@ -26,12 +26,15 @@ class UserController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { page, limit } = paginationSchema_1.paginationSchema.parse(req.query);
-            const users = yield user_model_1.User.find()
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .select("-password -__v -refreshToken")
-                .lean();
-            res.json((0, responseHelpers_1.createResponse)(200, users, "Successfully fetched users"));
+            const [users, total] = yield Promise.all([
+                user_model_1.User.find()
+                    .skip((page - 1) * limit)
+                    .limit(limit)
+                    .select("-password -__v -refreshToken")
+                    .lean(),
+                user_model_1.User.countDocuments()
+            ]);
+            res.json((0, responseHelpers_1.createResponse)(200, users, "Successfully fetched users", { page, limit, total }));
         });
     }
     create(req, res) {

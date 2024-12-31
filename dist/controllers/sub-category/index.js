@@ -27,10 +27,13 @@ class SubCategory {
                 const categories = yield sub_category_model_1.SubCategory.find().populate("category");
                 return res.json((0, responseHelpers_1.createResponse)(200, categories, "Successfully fetched sub-categories"));
             }
-            const categories = yield sub_category_model_1.SubCategory.find()
-                .skip((page - 1) * limit)
-                .limit(limit);
-            res.json((0, responseHelpers_1.createResponse)(200, categories, "Successfully fetched sub-categories"));
+            const [categories, total] = yield Promise.all([
+                sub_category_model_1.SubCategory.find()
+                    .skip((page - 1) * limit)
+                    .limit(limit),
+                sub_category_model_1.SubCategory.countDocuments()
+            ]);
+            res.json((0, responseHelpers_1.createResponse)(200, categories, "Successfully fetched sub-categories", { page, limit, total }));
         });
     }
     create(req, res) {

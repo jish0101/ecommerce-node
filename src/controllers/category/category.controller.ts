@@ -9,12 +9,16 @@ import { Category as CategoryModel } from "../../models/category/category.model"
 class Category {
   async get(req: Request, res: Response) {
     const { page, limit } = paginationSchema.parse(req.query);
-    const categories = await CategoryModel.find()
+
+    const [categories, total] = await Promise.all([
+      CategoryModel.find()
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit),
+      CategoryModel.countDocuments()
+    ])
 
     res.json(
-      createResponse(200, categories, "Successfully fetched categories"),
+      createResponse(200, categories, "Successfully fetched categories", {page, limit, total}),
     );
   }
   async create(req: Request, res: Response) {

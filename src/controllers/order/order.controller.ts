@@ -88,11 +88,14 @@ class OrderController {
     const user = req.user as PayloadUserWithID;
     const { page, limit } = paginationSchema.parse(req.query);
 
-    const orders = await Order.find({ customer: user._id })
+    const [orders, total] = await Promise.all([
+      Order.find({ customer: user._id })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit),
+      Order.countDocuments()
+    ]);
 
-    return res.json(createResponse(200, orders, "Successfully fetched orders"));
+    return res.json(createResponse(200, orders, "Successfully fetched orders", {page, limit, total}));
   }
   async update(req: Request, res: Response) {
     const payloadUser = req.user as PayloadUserWithID;
