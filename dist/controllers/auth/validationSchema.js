@@ -23,7 +23,9 @@ exports.verifyUserSchema = zod_1.default.object({
         }
         return "";
     }),
-    type: zod_1.default.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"]),
+    type: zod_1.default.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD", "EMAIL CHANGE"], {
+        message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
+    }),
     value: zod_1.default
         .string()
         .refine((n) => regex_1.NUMBER_REGEX.test(n), "Provide valid otp to validate user")
@@ -32,7 +34,7 @@ exports.verifyUserSchema = zod_1.default.object({
 exports.sendOtpSchema = zod_1.default.object({
     email: zod_1.default.string().trim().max(100, "email is too large").optional(),
     userId: zod_1.default.string().trim().max(100, "userId is too large").optional(),
-    type: zod_1.default.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"], {
+    type: zod_1.default.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD", "EMAIL CHANGE"], {
         message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
     }),
 });

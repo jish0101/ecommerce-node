@@ -14,7 +14,7 @@ const otpSchema = new mongoose_1.default.Schema({
     type: {
         type: String,
         required: true,
-        enum: ["EMAIL VERIFICATION", "FORGOT PASSWORD"],
+        enum: ["EMAIL VERIFICATION", "FORGOT PASSWORD", "EMAIL CHANGE"],
     },
     isUsed: {
         type: Boolean,

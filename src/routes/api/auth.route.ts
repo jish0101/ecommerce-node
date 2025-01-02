@@ -3,7 +3,7 @@ import { asyncWrapper } from "@/lib/helpers";
 import { rateLimit } from "express-rate-limit";
 import AuthController from "@/controllers/auth/auth.controller";
 import { authenticateGoogle, authGoogleCallback } from "@/middlewares/passport";
-import GoogleAuthController from "@/controllers/google-auth/googleAuth.controller";
+import GoogleAuthController from "@/controllers/google-auth/google-auth.controller";
 
 const router = express.Router();
 const authController = new AuthController();

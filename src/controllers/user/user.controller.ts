@@ -16,14 +16,20 @@ class UserController {
 
     const [users, total] = await Promise.all([
       User.find()
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .select("-password -__v -refreshToken")
-      .lean(),
-      User.countDocuments()
-    ])
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password -__v -refreshToken")
+        .lean(),
+      User.countDocuments(),
+    ]);
 
-    res.json(createResponse(200, users, "Successfully fetched users", {page, limit, total}));
+    res.json(
+      createResponse(200, users, "Successfully fetched users", {
+        page,
+        limit,
+        total,
+      }),
+    );
   }
   async create(req: Request, res: Response) {
     const result = createUserSchema.parse(req.body);
@@ -91,13 +97,10 @@ class UserController {
     // user is adding new email
     if (user.email !== body.email) {
       if (!body.otp_id || !body.otp_value) {
-        throw new CustomError(
-          "Email cannot be changed without otp_id, otp_value",
-          400,
-        );
+        throw new CustomError("Email cannot be changed without valid otp", 400);
       }
 
-      // check if anothe user has same email if yes return
+      // check if another user has same email if yes return
       const existingUser = await User.findOne({ email: body.email });
 
       if (existingUser) {
@@ -112,7 +115,7 @@ class UserController {
       await otpService.verifyOtp({
         _id: body.otp_id,
         value: body.otp_value,
-        type: "EMAIL VERIFICATION",
+        type: "EMAIL CHANGE",
         userId: user._id as string,
       });
     }
@@ -120,7 +123,7 @@ class UserController {
     const updatedUser = await User.findByIdAndUpdate(
       payloadUser._id,
       {
-        userName: body.userName,
+        fullName: `${body.firstName} ${body.lastName}`,
         email: body.email,
       },
       { new: true },
@@ -141,36 +144,26 @@ class UserController {
 
     const user = req.user as PayloadUser & { _id: string };
 
-    if (!user) {
-      throw new CustomError("user is missing", 404);
-    }
-
-    const foundUser = await User.findById(user._id);
-
-    if (!foundUser) {
-      throw new CustomError("user not found", 404);
-    }
-
     const opm = new OptimisedImage(req.file);
-
-    if (foundUser.profileImage) {
-      opm.deleteImageByLink(foundUser.profileImage, foundUser.email);
-    }
 
     const image = await opm.getProfileImg({
       w: 400,
       h: 400,
       q: 80,
-      folder: foundUser.email,
+      folder: user.email,
     });
 
     if (!image) {
       throw new CustomError("Failed to upload profile", 500);
     }
 
-    foundUser.profileImage = image;
+    await User.findByIdAndUpdate(user._id, {
+      profileImage: image,
+    });
 
-    await foundUser.save();
+    if (user.profileImage) {
+      await opm.deleteImageByLink(user.profileImage, user.email);
+    }
 
     res.json(createResponse(200, image, "Successfully uploaded profile"));
   }

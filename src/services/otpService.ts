@@ -16,7 +16,7 @@ class OtpService {
 
     const createdOtp = await Otp.create({
       user: userId,
-      type: type,
+      type,
       value: parseInt(otp, 10),
       expiresAt,
     });

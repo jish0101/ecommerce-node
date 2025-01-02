@@ -50,7 +50,7 @@ class AuthController {
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      sameSite: KEYS.NODE_ENV === "production" ? "none": "lax",
+      sameSite: KEYS.NODE_ENV === "production" ? "none" : "lax",
       secure: KEYS.NODE_ENV === "production",
     });
     res.json(createResponse(200, payloadUser, "Successfully logged-in user"));
@@ -67,7 +67,7 @@ class AuthController {
 
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      sameSite: KEYS.NODE_ENV === "production" ? "none": "lax",
+      sameSite: KEYS.NODE_ENV === "production" ? "none" : "lax",
       secure: KEYS.NODE_ENV === "production",
     });
 
@@ -181,6 +181,7 @@ class AuthController {
     if (!user) {
       throw new CustomError("User not found", 404, false);
     }
+    const toSendEmail = email ? email : user.email;
 
     if (user.isVerified && type === "EMAIL VERIFICATION") {
       throw new CustomError("User is already verified", 400, false);
@@ -194,7 +195,7 @@ class AuthController {
     const mailer = new Mailer();
 
     await mailer.sendConfirmationOtp({
-      email: user.email,
+      email: toSendEmail,
       otpVal: createdOtp.value,
       userName: user.fullName,
       type,

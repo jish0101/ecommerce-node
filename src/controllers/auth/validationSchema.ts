@@ -19,7 +19,9 @@ export const verifyUserSchema = z.object({
       }
       return "";
     }),
-  type: z.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"]),
+  type: z.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD", "EMAIL CHANGE"], {
+    message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
+  }),
   value: z
     .string()
     .refine((n) => NUMBER_REGEX.test(n), "Provide valid otp to validate user")
@@ -29,7 +31,7 @@ export const verifyUserSchema = z.object({
 export const sendOtpSchema = z.object({
   email: z.string().trim().max(100, "email is too large").optional(),
   userId: z.string().trim().max(100, "userId is too large").optional(),
-  type: z.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD"], {
+  type: z.enum(["EMAIL VERIFICATION", "FORGOT PASSWORD", "EMAIL CHANGE"], {
     message: `Supported otp types are: "EMAIL VERIFICATION", "FORGOT PASSWORD"`,
   }),
 });

@@ -20,10 +20,12 @@ const customError_1 = require("../lib/customError");
 const otpTypeSubjectMap = {
     "EMAIL VERIFICATION": "Email verification information",
     "FORGOT PASSWORD": "Password reset information",
+    "EMAIL CHANGE": "Email change information",
 };
 const templateDir = {
     "EMAIL VERIFICATION": ["otp-templates", "otp.ejs"],
     "FORGOT PASSWORD": ["otp-templates", "otp.ejs"],
+    "EMAIL CHANGE": ["otp-templates", "otp.ejs"],
 };
 class Mailer {
     sendConfirmationOtp(config) {

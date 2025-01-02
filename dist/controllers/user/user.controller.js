@@ -32,9 +32,13 @@ class UserController {
                     .limit(limit)
                     .select("-password -__v -refreshToken")
                     .lean(),
-                user_model_1.User.countDocuments()
+                user_model_1.User.countDocuments(),
             ]);
-            res.json((0, responseHelpers_1.createResponse)(200, users, "Successfully fetched users", { page, limit, total }));
+            res.json((0, responseHelpers_1.createResponse)(200, users, "Successfully fetched users", {
+                page,
+                limit,
+                total,
+            }));
         });
     }
     create(req, res) {
@@ -84,9 +88,9 @@ class UserController {
             // user is adding new email
             if (user.email !== body.email) {
                 if (!body.otp_id || !body.otp_value) {
-                    throw new customError_1.CustomError("Email cannot be changed without otp_id, otp_value", 400);
+                    throw new customError_1.CustomError("Email cannot be changed without valid otp", 400);
                 }
-                // check if anothe user has same email if yes return
+                // check if another user has same email if yes return
                 const existingUser = yield user_model_1.User.findOne({ email: body.email });
                 if (existingUser) {
                     throw new customError_1.CustomError("Email cannot be changed, duplicate user found.", 400);
@@ -95,12 +99,12 @@ class UserController {
                 yield otpService.verifyOtp({
                     _id: body.otp_id,
                     value: body.otp_value,
-                    type: "EMAIL VERIFICATION",
+                    type: "EMAIL CHANGE",
                     userId: user._id,
                 });
             }
             const updatedUser = yield user_model_1.User.findByIdAndUpdate(payloadUser._id, {
-                userName: body.userName,
+                fullName: `${body.firstName} ${body.lastName}`,
                 email: body.email,
             }, { new: true })
                 .select("-__v -refreshToken -password")
@@ -117,28 +121,22 @@ class UserController {
                 throw new customError_1.CustomError("image file is missing", 400);
             }
             const user = req.user;
-            if (!user) {
-                throw new customError_1.CustomError("user is missing", 404);
-            }
-            const foundUser = yield user_model_1.User.findById(user._id);
-            if (!foundUser) {
-                throw new customError_1.CustomError("user not found", 404);
-            }
             const opm = new ImageService_1.default(req.file);
-            if (foundUser.profileImage) {
-                opm.deleteImageByLink(foundUser.profileImage, foundUser.email);
-            }
             const image = yield opm.getProfileImg({
                 w: 400,
                 h: 400,
                 q: 80,
-                folder: foundUser.email,
+                folder: user.email,
             });
             if (!image) {
                 throw new customError_1.CustomError("Failed to upload profile", 500);
             }
-            foundUser.profileImage = image;
-            yield foundUser.save();
+            yield user_model_1.User.findByIdAndUpdate(user._id, {
+                profileImage: image,
+            });
+            if (user.profileImage) {
+                yield opm.deleteImageByLink(user.profileImage, user.email);
+            }
             res.json((0, responseHelpers_1.createResponse)(200, image, "Successfully uploaded profile"));
         });
     }

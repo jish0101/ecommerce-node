@@ -15,11 +15,13 @@ type SendConfirmationOtpConfig = {
 const otpTypeSubjectMap: Record<OtpAction, string> = {
   "EMAIL VERIFICATION": "Email verification information",
   "FORGOT PASSWORD": "Password reset information",
+  "EMAIL CHANGE": "Email change information",
 };
 
 const templateDir: Record<OtpAction, string[]> = {
   "EMAIL VERIFICATION": ["otp-templates", "otp.ejs"],
   "FORGOT PASSWORD": ["otp-templates", "otp.ejs"],
+  "EMAIL CHANGE": ["otp-templates", "otp.ejs"],
 };
 
 class Mailer {

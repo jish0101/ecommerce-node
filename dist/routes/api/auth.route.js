@@ -8,10 +8,10 @@ const helpers_1 = require("../../lib/helpers");
 const express_rate_limit_1 = require("express-rate-limit");
 const auth_controller_1 = __importDefault(require("../../controllers/auth/auth.controller"));
 const passport_1 = require("../../middlewares/passport");
-const googleAuth_controller_1 = __importDefault(require("../../controllers/google-auth/googleAuth.controller"));
+const google_auth_controller_1 = __importDefault(require("../../controllers/google-auth/google-auth.controller"));
 const router = express_1.default.Router();
 const authController = new auth_controller_1.default();
-const googleAuthController = new googleAuth_controller_1.default();
+const googleAuthController = new google_auth_controller_1.default();
 const strictRateLimiter = (0, express_rate_limit_1.rateLimit)({
     windowMs: 2 * 60 * 1000,
     max: 1,

@@ -135,6 +135,7 @@ class AuthController {
             if (!user) {
                 throw new customError_1.CustomError("User not found", 404, false);
             }
+            const toSendEmail = email ? email : user.email;
             if (user.isVerified && type === "EMAIL VERIFICATION") {
                 throw new customError_1.CustomError("User is already verified", 400, false);
             }
@@ -144,7 +145,7 @@ class AuthController {
             });
             const mailer = new emailService_1.default();
             yield mailer.sendConfirmationOtp({
-                email: user.email,
+                email: toSendEmail,
                 otpVal: createdOtp.value,
                 userName: user.fullName,
                 type,

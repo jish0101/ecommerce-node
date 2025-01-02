@@ -22,7 +22,7 @@ class OtpService {
             const expiresAt = Date.now() + 5 * 60 * 1000;
             const createdOtp = yield Otp_1.Otp.create({
                 user: userId,
-                type: type,
+                type,
                 value: parseInt(otp, 10),
                 expiresAt,
             });

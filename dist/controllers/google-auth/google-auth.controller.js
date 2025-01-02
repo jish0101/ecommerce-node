@@ -37,4 +37,4 @@ class GoogleAuthController {
     }
 }
 exports.default = GoogleAuthController;
-//# sourceMappingURL=googleAuth.controller.js.map
+//# sourceMappingURL=google-auth.controller.js.map

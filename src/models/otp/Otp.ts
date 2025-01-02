@@ -1,6 +1,9 @@
 import mongoose, { Document } from "mongoose";
 
-export type OtpAction = "EMAIL VERIFICATION" | "FORGOT PASSWORD";
+export type OtpAction =
+  | "EMAIL VERIFICATION"
+  | "FORGOT PASSWORD"
+  | "EMAIL CHANGE";
 
 export interface Otp extends Document {
   user: typeof mongoose.Schema.ObjectId;
@@ -19,7 +22,7 @@ const otpSchema = new mongoose.Schema<Otp>({
   type: {
     type: String,
     required: true,
-    enum: ["EMAIL VERIFICATION", "FORGOT PASSWORD"],
+    enum: ["EMAIL VERIFICATION", "FORGOT PASSWORD", "EMAIL CHANGE"],
   },
   isUsed: {
     type: Boolean,
