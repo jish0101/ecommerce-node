@@ -5,9 +5,10 @@ import { CustomError } from "@/lib/customError";
 import OptimisedImage from "@/services/ImageService";
 import { createProductSchema } from "./productSchema";
 import { paginationSchema } from "../paginationSchema";
-import { Product } from "@/models/product/product.model";
+import { IProduct, Product } from "@/models/product/product.model";
 import { createResponse } from "../../lib/responseHelpers";
 import { PayloadUserWithID } from "@/models/user/user.model";
+import { FilterQuery } from "mongoose";
 
 const getSchemaWithoutPagination = z.object({
   id: z.string().trim().optional().default(""),
@@ -22,7 +23,7 @@ class ProductController {
     const result = getSchema.parse(req.query);
     const { id, page, limit, search, categoryId, subCategoryId } = result;
 
-    const query: Record<any, any> = {};
+    const query: FilterQuery<IProduct> = {};
 
     if (categoryId) {
       query.category = categoryId;
@@ -42,13 +43,17 @@ class ProductController {
 
     const [products, total] = await Promise.all([
       Product.find(query)
-      .skip((page - 1) * limit)
-      .limit(limit),
-      Product.countDocuments(query)
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Product.countDocuments(query),
     ]);
 
     return res.json(
-      createResponse(200, products, "Successfully fetched products", {page, limit, total}),
+      createResponse(200, products, "Successfully fetched products", {
+        page,
+        limit,
+        total,
+      }),
     );
   }
   async create(req: Request, res: Response) {

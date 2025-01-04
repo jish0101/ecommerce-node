@@ -49,9 +49,13 @@ class ProductController {
                 product_model_1.Product.find(query)
                     .skip((page - 1) * limit)
                     .limit(limit),
-                product_model_1.Product.countDocuments(query)
+                product_model_1.Product.countDocuments(query),
             ]);
-            return res.json((0, responseHelpers_1.createResponse)(200, products, "Successfully fetched products", { page, limit, total }));
+            return res.json((0, responseHelpers_1.createResponse)(200, products, "Successfully fetched products", {
+                page,
+                limit,
+                total,
+            }));
         });
     }
     create(req, res) {

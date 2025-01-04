@@ -22,7 +22,7 @@ class PaymentsController {
 
     const orderDoc = await Order.findById(result.orderId).populate(
       "customer",
-      "userName email",
+      "fullName email",
     );
 
     if (!orderDoc) {

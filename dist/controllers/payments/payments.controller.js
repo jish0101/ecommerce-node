@@ -29,7 +29,7 @@ class PaymentsController {
     createOrder(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = validationSchema_1.createPaymentOrder.parse(req.body);
-            const orderDoc = yield order_model_1.Order.findById(result.orderId).populate("customer", "userName email");
+            const orderDoc = yield order_model_1.Order.findById(result.orderId).populate("customer", "fullName email");
             if (!orderDoc) {
                 throw new customError_1.CustomError("Order not found", 404);
             }

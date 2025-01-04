@@ -1,6 +1,25 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 
-const productSchema = new mongoose.Schema({
+export interface IProduct extends Document {
+  name: string;
+  desc: string;
+  category: mongoose.Types.ObjectId;
+  categoryName: string;
+  subCategory: mongoose.Types.ObjectId;
+  subCategoryName: string;
+  price: number;
+  offerPriceDiscount: number;
+  stock: number;
+  imageLinks: string[];
+  isFeatured: boolean;
+  updatedBy: mongoose.Types.ObjectId;
+  createdBy: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const productSchema = new Schema<IProduct>(
+  {
     name: {
       type: String,
       required: true,
@@ -13,7 +32,7 @@ const productSchema = new mongoose.Schema({
       lowercase: true,
     },
     category: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
@@ -22,7 +41,7 @@ const productSchema = new mongoose.Schema({
       required: true,
     },
     subCategory: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "SubCategory",
       required: true,
     },
@@ -34,6 +53,10 @@ const productSchema = new mongoose.Schema({
       type: Number,
       default: 0,
     },
+    offerPriceDiscount: {
+      type: Number,
+      default: 0,
+    },
     stock: {
       type: Number,
       default: 0,
@@ -42,13 +65,17 @@ const productSchema = new mongoose.Schema({
       type: [String],
       default: [],
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     updatedBy: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     createdBy: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -56,6 +83,13 @@ const productSchema = new mongoose.Schema({
   { timestamps: true },
 );
 
-productSchema.index({name: "text", "category.name": "text", "subCategory.name": "text"})
+productSchema.index({
+  name: "text",
+  "category.name": "text",
+  "subCategory.name": "text",
+});
 
-export const Product = mongoose.model("Product", productSchema);
+export const Product: Model<IProduct> = mongoose.model<IProduct>(
+  "Product",
+  productSchema,
+);
