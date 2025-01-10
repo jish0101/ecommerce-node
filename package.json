@@ -10,7 +10,7 @@
     "ts.check": "tsc --project tsconfig.json",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx,json,md}",
     "prettier": "npx prettier --write src/**/*.{js,jsx,ts,tsx,json,md}",
-    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/index.ts",
     "seed": "ts-node-dev -r tsconfig-paths/register src/seed.ts",
     "build": "rimraf dist && tsc -p tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist && copyfiles -u 1 src/templates/**/* dist"
   },
